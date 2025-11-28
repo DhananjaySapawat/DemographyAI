@@ -11,7 +11,6 @@ from datetime import datetime, date
 
 router = APIRouter()
 
-
 def to_jsonable(value):
     """Recursively convert BSON/unsupported types to JSON-safe types."""
     if isinstance(value, ObjectId):

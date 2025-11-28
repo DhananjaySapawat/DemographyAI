@@ -1,11 +1,13 @@
 from app.processing.face_extractor import extract_faces
 from app.processing.image_process import buffer_to_cv, add_attributes_to_image
+from app.processing.video_process import add_attributes_to_video, extract_faces_from_video
 
-from app.ai.predictors import predict_attributes
-from app.cloud.cloud_upload import upload_image_to_cloud, upload_video_to_cloud
+from app.ai.predictors import predict_attributes, predict_attributes_for_video
 from app.db.crud import create_image_record, create_image_face_record, create_processed_image_record, create_video_record
 
-async def process_upload_image(file, upload_type):
+from app.storage import upload_image, upload_video
+
+async def process_uploaded_image(file, upload_type):
     try:
         # Read file
         img = await file.read()  
@@ -13,7 +15,7 @@ async def process_upload_image(file, upload_type):
 
         # Upload original image
         try:
-            image_url, image_public_id = upload_image_to_cloud(img)
+            image_url, image_public_id = upload_image(img)
             image_id = await create_image_record({
                 "url": image_url, 
                 "public_id": image_public_id, 
@@ -42,7 +44,7 @@ async def process_upload_image(file, upload_type):
         for face in faces_with_attributes:
             try:
                 attributes = face["attributes"]
-                face_url, face_public_id = upload_image_to_cloud(face["buffer_img"])
+                face_url, face_public_id = upload_image(face["buffer_img"])
 
                 # Save face info
                 await create_image_face_record({
@@ -74,7 +76,7 @@ async def process_upload_image(file, upload_type):
         # Add attributes to original image
         try:
             processed_img = add_attributes_to_image(cv_img, processed_info)
-            processed_image_url, processed_image_public_id = upload_image_to_cloud(processed_img)
+            processed_image_url, processed_image_public_id = upload_image(processed_img)
             await create_processed_image_record({
                 "url": processed_image_url, 
                 "original_id": image_id,
@@ -92,11 +94,24 @@ async def process_upload_image(file, upload_type):
         # Catch any other unexpected errors
         return {"error": f"Unexpected error: {e}"}
 
-async def process_upload_video(file):
-    video = await file.read()  
-    video_url = upload_video_to_cloud(video)
+from pathlib import Path
+
+async def process_uploaded_video(file):
+    raw_video_path = f"video_test/{file.filename}"
+    processed_video_path = f"video_test/processed_{Path(file.filename).stem}.webm"
+
+    # Save uploaded video to disk
+    with open(raw_video_path, "wb") as f:
+        f.write(await file.read())
+
+    video_info, face_images, faces_per_frame = extract_faces_from_video(raw_video_path)
+    faces_attributes = await predict_attributes_for_video(face_images)
+    add_attributes_to_video(processed_video_path, raw_video_path, video_info, faces_per_frame, faces_attributes)
+
+    video_url = upload_video(processed_video_path)
     await create_video_record({
-        "url" : video_url, 
-        "size" : file.size
+        "url": video_url,
+        "size": Path(raw_video_path).stat().st_size
     })
+
     return video_url

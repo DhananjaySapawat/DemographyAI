@@ -5,6 +5,8 @@ services:
     build: ./backend
     ports:
       - "8000:8000"
+    environment:
+      - MODEL_URL=http://model:9000
 
   model:
     build: ./model

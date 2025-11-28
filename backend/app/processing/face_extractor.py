@@ -29,6 +29,10 @@ def extract_face_coordinates_upload(image):
     return [scale_coordinates(face, scale, scale) for face in detected_faces]
 
 def preprocess_tflite(cv_image):
+    # Check if image is empty
+    if cv_image is None or cv_image.size == 0:
+        raise ValueError("Empty image passed to preprocess_tflite")
+
     face_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
     image = Image.fromarray(face_image.astype(np.uint8))
     image = image.resize((IMAGE_DIMENSION, IMAGE_DIMENSION), Image.BILINEAR)
@@ -37,9 +41,17 @@ def preprocess_tflite(cv_image):
     face_image = np.expand_dims(face_image, axis=0)
     return face_image
 
+
 async def extract_faces(image) -> list:
     faces = []
     for (x, y, w, h) in extract_face_coordinates_upload(image):
         face_img = image[y:y+h, x:x+w]
-        faces.append({"tflite_img" : preprocess_tflite(face_img), "buffer_img" : cv_to_buffer(face_img), "cords": (x, y, w, h)})
+        try:
+            faces.append({
+                "tflite_img": preprocess_tflite(face_img),
+                "buffer_img": cv_to_buffer(face_img),
+                "cords": (x, y, w, h)
+            })
+        except Exception as e:
+            print(f"Error processing face at {(x, y, w, h)}: {e}")
     return faces

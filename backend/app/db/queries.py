@@ -1,4 +1,4 @@
-from app.db.mongo import image_collection, processed_image_collection, face_collection, video_collection
+from app.db.connection import image_collection, processed_image_collection, face_collection, video_collection
 from bson.objectid import ObjectId
 from datetime import datetime, date
 
