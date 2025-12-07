@@ -1,8 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1 import detect, monitor
-from fastapi.staticfiles import StaticFiles
-from app.config import LOCAL_UPLOAD_DIR
+from app.startup import init_startup
 
 app = FastAPI(title="DemographyAI")
 
@@ -15,7 +14,7 @@ app.add_middleware(
     allow_headers=["*"],   
 )
 
-app.mount("/uploads", StaticFiles(directory=LOCAL_UPLOAD_DIR), name="uploads")
+init_startup(app)
 
 # Register routers
 app.include_router(detect.router, prefix="", tags=["Detect"])

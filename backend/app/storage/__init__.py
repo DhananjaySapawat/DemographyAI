@@ -1,12 +1,3 @@
-from app.config import IS_LOCAL
+from .factory import create_storage_provider
 
-if IS_LOCAL:
-    from app.storage.local.upload import (
-        upload_image_local as upload_image,
-        upload_video_local as upload_video,
-    )
-else:
-    from app.storage.cloud.upload import (
-        upload_image_to_cloud as upload_image,
-        upload_video_to_cloud as upload_video,
-    )
+__all__ = ["create_storage_provider"]

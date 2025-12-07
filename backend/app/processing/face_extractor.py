@@ -1,5 +1,5 @@
 import cv2
-from app.processing.image_process import cv_to_buffer
+from .image_process import cv_to_buffer
 import numpy as np
 from PIL import Image
 
@@ -7,7 +7,7 @@ IMAGE_DIMENSION = 200
 MEAN = np.array([0.485, 0.456, 0.406])
 STD = np.array([0.229, 0.224, 0.225])
 
-yunet_model_path = "models/face_model/yunet_n_640_640.onnx"
+yunet_model_path = "app/processing/face_model/yunet_n_640_640.onnx"
 
 def scale_coordinates(face_coordinates, scale_width, scale_height):
     x, y, w, h = face_coordinates[:4]

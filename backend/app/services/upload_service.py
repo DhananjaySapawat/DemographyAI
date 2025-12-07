@@ -1,11 +1,10 @@
-from app.processing.face_extractor import extract_faces
-from app.processing.image_process import buffer_to_cv, add_attributes_to_image
-from app.processing.video_process import add_attributes_to_video, extract_faces_from_video
+from app.processing import *
+from app.ai import predict_attributes, predict_attributes_for_video
+from app.providers import storage, database
 
-from app.ai.predictors import predict_attributes, predict_attributes_for_video
-from app.db.crud import create_image_record, create_image_face_record, create_processed_image_record, create_video_record
-
-from app.storage import upload_image, upload_video
+import tempfile
+import traceback
+from pathlib import Path
 
 async def process_uploaded_image(file, upload_type):
     try:
@@ -15,15 +14,16 @@ async def process_uploaded_image(file, upload_type):
 
         # Upload original image
         try:
-            image_url, image_public_id = upload_image(img)
-            image_id = await create_image_record({
-                "url": image_url, 
-                "public_id": image_public_id, 
+            img_upload = storage.upload_image(img)
+            image_id = database.add_image({
+                "url": img_upload["url"], 
+                "public_id": img_upload["id"], 
                 "type": upload_type,
                 "face_count": 0,
                 "size": file.size
             })
         except Exception as e:
+            traceback.print_exc()
             return {"error": f"Failed to upload original image: {e}"}
 
         results, processed_info = [], []
@@ -32,25 +32,27 @@ async def process_uploaded_image(file, upload_type):
         try:
             faces = await extract_faces(cv_img)
         except Exception as e:
+            traceback.print_exc()
             return {"error": f"Failed to extract faces: {e}"}
 
         # Predict attributes
         try:
             faces_with_attributes = await predict_attributes(faces)
         except Exception as e:
+            traceback.print_exc()
             return {"error": f"Failed to predict attributes: {e}"}
         
         # Process each face
         for face in faces_with_attributes:
             try:
                 attributes = face["attributes"]
-                face_url, face_public_id = upload_image(face["buffer_img"])
+                face_upload = storage.upload_image(face["buffer_img"])
 
                 # Save face info
-                await create_image_face_record({
+                database.add_face({
                     "image_id": image_id,
-                    "public_id": face_public_id,
-                    "url": face_url,
+                    "public_id": face_upload["id"],
+                    "url": face_upload["url"],
                     "age_v1": attributes.get("age_v1"),
                     "age_v2": attributes.get("age_v2"),
                     "gender": attributes.get("gender"),
@@ -59,7 +61,7 @@ async def process_uploaded_image(file, upload_type):
                 })
 
                 results.append({
-                    "url": face_url,
+                    "url": face_upload["url"],
                     **attributes
                 })
 
@@ -70,46 +72,54 @@ async def process_uploaded_image(file, upload_type):
 
             except Exception as e:
                 # Continue processing other faces but log error
+                traceback.print_exc()
                 print(f"Error processing face: {e}")
                 continue
 
         # Add attributes to original image
         try:
             processed_img = add_attributes_to_image(cv_img, processed_info)
-            processed_image_url, processed_image_public_id = upload_image(processed_img)
-            await create_processed_image_record({
-                "url": processed_image_url, 
+            proc_img_upload = storage.upload_image(processed_img)
+            database.add_processed_image({
+                "url": proc_img_upload["url"], 
                 "original_id": image_id,
-                "public_id": processed_image_public_id, 
+                "public_id": proc_img_upload["id"], 
                 "type": upload_type,
                 "face_count": len(processed_info),
                 "size": file.size
             })
         except Exception as e:
+            traceback.print_exc()
             print(f"Error processing final image: {e}")
 
         return results
 
     except Exception as e:
         # Catch any other unexpected errors
+        traceback.print_exc()
         return {"error": f"Unexpected error: {e}"}
 
-from pathlib import Path
-
 async def process_uploaded_video(file):
-    raw_video_path = f"video_test/{file.filename}"
-    processed_video_path = f"video_test/processed_{Path(file.filename).stem}.webm"
+    # Use tempfile for raw video
+    raw_temp = tempfile.NamedTemporaryFile(delete=False, suffix=Path(file.filename).suffix)
+    raw_video_path = raw_temp.name
+    raw_temp.close()
 
-    # Save uploaded video to disk
+    # Save uploaded video
     with open(raw_video_path, "wb") as f:
         f.write(await file.read())
+
+    # Use tempfile for processed video
+    processed_temp = tempfile.NamedTemporaryFile(delete=False, suffix=".webm")
+    processed_video_path = processed_temp.name
+    processed_temp.close()
 
     video_info, face_images, faces_per_frame = extract_faces_from_video(raw_video_path)
     faces_attributes = await predict_attributes_for_video(face_images)
     add_attributes_to_video(processed_video_path, raw_video_path, video_info, faces_per_frame, faces_attributes)
 
-    video_url = upload_video(processed_video_path)
-    await create_video_record({
+    video_url = storage.upload_video(processed_video_path)
+    database.add_video({
         "url": video_url,
         "size": Path(raw_video_path).stat().st_size
     })

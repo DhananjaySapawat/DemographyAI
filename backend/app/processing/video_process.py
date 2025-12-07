@@ -1,5 +1,5 @@
 import cv2
-from app.processing.face_extractor import extract_face_coordinates_upload, preprocess_tflite
+from .face_extractor import extract_face_coordinates_upload, preprocess_tflite
 
 def get_video_properties(video_capture):
     fps = video_capture.get(cv2.CAP_PROP_FPS)
