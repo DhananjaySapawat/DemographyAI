@@ -33,10 +33,10 @@ def extract_faces_from_video(video_path) -> list:
         for (x, y, w, h) in extract_face_coordinates_upload(frame):
             try:
                 face_crop = frame[y:y + h, x:x + w]
-                face_images[total_face_count % 4] = preprocess_tflite(face_crop)
+                face_images[total_face_count] = preprocess_tflite(face_crop)
 
                 faces_per_frame[frame_index].append({
-                    "face_id": total_face_count % 4,
+                    "face_id": total_face_count,
                     "coordinates": (x, y, w, h)
                 })
 
@@ -47,6 +47,7 @@ def extract_faces_from_video(video_path) -> list:
 
         frame_index += 1
 
+    print(total_face_count)
     video_capture.release()
     video_info["total_faces"] = total_face_count - 1
     return video_info, face_images, faces_per_frame
