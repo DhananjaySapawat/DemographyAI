@@ -6,9 +6,7 @@ from inference.predict import predict_attributes_from_model
 app = FastAPI(title="DemographyAI Model")
 
 class FaceListItem(BaseModel):
-    array: str
-    shape: List[int]
-    dtype: str
+    image: str
     face_id: str
 
 class FaceListPayload(BaseModel):
@@ -19,7 +17,7 @@ async def predict_attributes(payload: FaceListPayload):
     try:
         results = {}
         for encoded_face in payload.face_array:
-            result = await predict_attributes_from_model(encoded_face)
+            result = await predict_attributes_from_model(encoded_face.image)
             results[encoded_face.face_id] = result
         return {"predictions": results}
     except Exception as e:

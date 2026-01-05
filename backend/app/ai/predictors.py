@@ -2,6 +2,7 @@ from app.config import MODEL_URL
 import base64
 import requests 
 import traceback
+import cv2 
 
 async def predict_attributes(frame_faces):
     try:
@@ -9,12 +10,11 @@ async def predict_attributes(frame_faces):
 
         payload_arrays = []
         for key in frame_faces.keys():
-            img_bytes = frame_faces[key].tobytes()
-            img_b64 = base64.b64encode(img_bytes).decode('utf-8')
+            _, buffer = cv2.imencode('.png', frame_faces[key])
+            img_b64 = base64.b64encode(buffer).decode()
+
             payload_arrays.append({
-                "array": img_b64,
-                "shape": frame_faces[key].shape,
-                "dtype": str(frame_faces[key].dtype),
+                "image": img_b64,
                 "face_id": key
             })
 

@@ -2,8 +2,6 @@ import cv2
 from .image_utils import write_face_labels, extract_face_coordinates
 from app.ai import predict_attributes
 
-from .temp import video_tflite
-
 class VideoProcessor:
 
     def __init__(self, input_path: str, output_path: str):
@@ -58,8 +56,8 @@ class VideoProcessor:
 
             frame_idx += 1
 
-    def predict_values(self):
-        self.faces_attributes = predict_attributes(video_tflite(self.video_faces))
+    async def predict_values(self):
+        self.faces_attributes = await predict_attributes(self.video_faces)
 
     def write_face_attributes(self):
         frame_idx = 0
@@ -84,8 +82,8 @@ class VideoProcessor:
         self.out.release()
 
 
-    def process(self):
+    async def process(self):
         self.extract_faces()
-        self.predict_values()
+        await self.predict_values()
         self.write_face_attributes()
         

@@ -1,11 +1,11 @@
-from .face_extractor import extract_faces
-from .image_process import buffer_to_cv, add_attributes_to_image
-from .video_process import add_attributes_to_video, extract_faces_from_video
+from .image_utils import buffer_to_cv, cv_to_buffer, extract_face_coordinates, write_face_labels
+from .video_processing import VideoProcessor
+
 
 __all__ = [
-    "extract_faces",
     "buffer_to_cv",
-    "add_attributes_to_image",
-    "add_attributes_to_video",
-    "extract_faces_from_video"
+    "cv_to_buffer",
+    "extract_face_coordinates",
+    "write_face_labels",
+    "VideoProcessor"
 ]

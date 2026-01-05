@@ -1,5 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException, status
-from app.service import ImageService, VideoService
+from app.services import ImageService, VideoService
 
 router = APIRouter()
 
@@ -24,18 +24,28 @@ async def detect_image_upload(file: UploadFile = File(...)):
 
 @router.post("/detect/image/snapshot")
 async def detect_image_snapshot(file: UploadFile = File(...)):
-    try :
+    try:
         snapshot_service = ImageService(file, "image_snapshot")
         await snapshot_service.process_image()
         return {"result": snapshot_service.result}
+
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+
     except Exception as e:
-        return {"error": str(e)}
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Image processing failed"
+        )
 
 @router.post("/detect/video/upload")
 async def detect_video_upload(file: UploadFile = File(...)):
     try :
         video_service = VideoService(file)
-        video_url = await video_service.run(file)
+        video_url = await video_service.process_video()
         return {"video_url": video_url}
     except Exception as e:
         return {"error": str(e)}

@@ -36,16 +36,6 @@ class MongoDatabase(BaseDatabase):
         if "image_id" not in face_data:
             raise ValueError("face_data must contain 'image_id'")
 
-        # Convert image_id from string → ObjectId if needed
-        if isinstance(face_data["image_id"], str):
-            face_data["image_id"] = ObjectId(face_data["image_id"])
-
-        # Increment face_count in the parent image document
-        self.image_collection.update_one(
-            {"_id": face_data["image_id"]},
-            {"$inc": {"face_count": 1}}
-        )
-
         result = self.face_collection.insert_one(face_data)
         return result.inserted_id
 

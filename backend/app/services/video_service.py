@@ -1,9 +1,9 @@
-from app.providers import storage, database
 import tempfile
 import os
 from pathlib import Path
 
-from app.process import VideoProcessor
+from app.providers import storage, database
+from app.processing import VideoProcessor
 
 class VideoService:
     def __init__(self, file):
@@ -12,7 +12,7 @@ class VideoService:
         self.processed_path = None
         self.video_url = None
 
-    def _create_temp_files(self):
+    def _prepare_temp_paths(self):
         raw = tempfile.NamedTemporaryFile(
             delete=False,
             suffix=Path(self.file.filename).suffix
@@ -28,35 +28,44 @@ class VideoService:
         raw.close()
         processed.close()
 
-    def _save_uploaded_file(self):
+    async def _save_uploaded_file(self):
+        file_bytes = await self.file.read()
+        if not file_bytes:
+            raise ValueError("Uploaded file is empty")
+
         with open(self.raw_path, "wb") as f:
-            f.write(self.file.read())
+            f.write(file_bytes)
 
-    def _process_video(self):
+
+    async def _transcode_video(self):
         video_processor = VideoProcessor(self.raw_path, self.processed_path)
-        video_processor.process()
+        await video_processor.process()
 
-    def _upload_video(self):
+    def _upload_processed_video(self):
         self.video_url = storage.upload_video(self.processed_path)
 
     def _add_video_record(self):
-        database.upload({
+        database.add_video({
             "url": self.video_url,
             "size": Path(self.processed_path).stat().st_size
         })
 
-    def _cleanup(self):
+    def _cleanup_temp_files(self):
         for path in (self.raw_path, self.processed_path):
             if path and os.path.exists(path):
                 os.remove(path)
 
-    def run(self) -> str:
+    async def process_video(self) -> str:
         try:
-            self._create_temp_files()
-            self._save_uploaded_file()
-            self._process_video()
-            self._upload_video()
+            self._prepare_temp_paths()
+            await self._save_uploaded_file()
+            await self._transcode_video()
+            self._upload_processed_video()
             self._add_video_record()
             return self.video_url
+        
+        except Exception as e:
+            print(f"{VideoService}: {e}")
+        
         finally:
-            self._cleanup()
+            self._cleanup_temp_files()

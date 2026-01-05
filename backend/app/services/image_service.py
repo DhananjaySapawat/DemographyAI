@@ -1,8 +1,6 @@
 from app.providers import storage, database
-from app.process import buffer_to_cv, cv_to_buffer, extract_face_coordinates, write_face_labels
+from app.processing import buffer_to_cv, cv_to_buffer, extract_face_coordinates, write_face_labels
 from app.ai import predict_attributes
-
-from app.process.temp import video_tflite
 
 class ImageService:
     def __init__(self, file, upload_type: str):
@@ -31,10 +29,20 @@ class ImageService:
         self.image_faces = {}
         self.face_count = len(self.face_coordinates)
         for face_idx, (x, y, w, h) in enumerate(self.face_coordinates):
-            self.image_faces[f"face_{face_idx}"] = self.cv_image[y:y+h, x:x+w]
+            h_img, w_img = self.cv_image.shape[:2]
+
+            x1 = max(0, x)
+            y1 = max(0, y)
+            x2 = min(w_img, x + w)
+            y2 = min(h_img, y + h)
+
+            if x2 <= x1 or y2 <= y1:
+                continue
+
+            self.image_faces[f"face_{face_idx}"] = self.cv_image[y1:y2, x1:x2]
 
     async def _predict_attributes(self):
-        attributes = await predict_attributes(video_tflite(self.image_faces))
+        attributes = await predict_attributes(self.image_faces)
         return attributes
 
 
@@ -51,7 +59,7 @@ class ImageService:
         })
     
     def _add_face_image_record(self, face_attributes, face_upload):
-        return database.add_image({
+        return database.add_face({
                 "image_id": self.image_id,
                 "public_id": face_upload["id"],
                 "url": face_upload["url"],
@@ -63,7 +71,7 @@ class ImageService:
             })
     
     def _add_processed_image_record(self, processed_image_upload):
-        return database.add_image({
+        return database.add_processed_image({
             "url": processed_image_upload["url"], 
             "original_id": self.image_id,
             "public_id": processed_image_upload["id"], 
