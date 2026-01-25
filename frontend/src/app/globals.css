@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+}
+
+:root {
+  /* ==============================
+     Brand Colors
+  ============================== */
+  --color-brand-primary: #0f1729;
+  --color-brand-accent: #c00101;
+
+  /* ==============================
+     Backgrounds / Surfaces
+  ============================== */
+  --bg-theme-light:  rgba(15, 23, 41, 0.1);;
+  --bg-theme: #0f1729;
+  --bg-theme-hover: #131f40;
+  --bg-accent: #c00101;
+  --bg-accent-05: rgba(192, 1, 1, 0.05);
+
+  --bg-foreground: #ffffff;
+  --bg-primary: #fff;
+  --bg-secondary: #f6f8fc;
+
+
+  /* ==============================
+     Text on Dark (Navy / Hero)
+  ============================== */
+  --text-on-dark-primary: #ffffff;
+  --text-on-dark-secondary: #ffffffe6;
+  --text-on-dark-tertiary: #ffffffb2;
+  --text-on-dark-accent: #e30606;
+  --text-on-dark-accent-hover: #cc3333;  
+
+  /* ==============================
+     Text on Light (White Sections)
+  ============================== */
+  --text-primary: #0f1729;
+  --text-secondary: #3d4555;
+  --text-muted: #6b7280;
+
+  /* ==============================
+     Accent / Highlight Text
+  ============================== */
+  --text-accent-light: #ff4d4d;
+  --text-accent: #c00101;
+
+  /* ==============================
+     Buttons – Primary (Red)
+  ============================== */
+  --btn-primary-bg-light: rgba(255, 1, 1, 0.14);
+  --btn-primary-bg: #c00101;
+  --btn-primary-bg-hover: #a30101;
+  --btn-primary-text: #ffffff;
+
+  /* ==============================
+     Buttons – Secondary (White)
+  ============================== */
+  --btn-secondary-bg: #ffffff;
+  --btn-secondary-bg-hover: #f1f3f7;
+  --btn-secondary-text: #0f1729;
+  --btn-secondary-border: #d1d5db;
+  --btn-secondary-border-hover: #9ca3af;
+
+  /* ==============================
+     Badge
+  ============================== */
+   --badge-accent-primary-bg: rgba(192, 1, 1, 0.1);
+   --badge-accent-primary-bg-hover: rgba(192, 1, 1, 0.15);
+   --badge-accent-primary-text: #c00101;
+
+  /* ==============================
+     Borders / Dividers
+  ============================== */
+  --border-light: #e5e7eb;
+  --border-default: #d1d5db;
+  --border-strong: #9ca3af;
+  --border-dark: #374151;
+  --border-accent: #c00101;
+}

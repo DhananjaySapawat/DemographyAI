@@ -1,0 +1,129 @@
+.header {
+  z-index: 5;
+  background: var(--bg-theme);
+}
+
+.headerContainer {
+  max-width: 1280px;
+  height: 5rem;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logoWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.logoLink {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.logoLink:hover {
+  opacity: 0.8;
+}
+
+.logoTextPrimary {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-on-dark-primary);
+}
+
+.logoTextAccent {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-on-dark-accent);
+  margin-left: 2px;
+}
+
+.nav {
+  display: flex;
+}
+
+.navList {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+}
+
+.navItem {
+  display: flex;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  color: var(--text-on-dark-secondary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.navLink:hover {
+  background-color: rgba(255, 255, 255, 0.1);  
+  color: var(--text-on-dark-primary);
+}
+
+.activeNavLink{
+  background: var(--bg-accent);
+  color: var(--text-on-dark-primary);
+}
+
+.activeNavLink:hover {
+  background: var(--bg-accent);
+  color: var(--text-on-dark-primary);
+}
+
+.themeToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 42px;
+  height: 42px;
+
+  border-radius: 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  background: var(--bg-theme);
+  color: var(--text-on-dark-secondary);
+
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.themeToggle:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-on-dark-primary);
+}
+
+.themeToggle:active {
+  scale: 0.96;
+}
+
+.themeToggle:focus-visible {
+  outline: 2px solid var(--bg-accent);
+  outline-offset: 2px;
+}
+
+.iconWrapper {
+  display: flex;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.themeToggle:hover .iconWrapper {
+  transform: rotate(15deg);
+}

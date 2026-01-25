@@ -1,0 +1,116 @@
+.footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-theme);
+  color: var(--text-on-dark-secondary);
+}
+
+.container {
+  max-width: 72rem; 
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.topRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+
+.brandBlock {
+  text-align: left;
+}
+
+.logo {
+  display: inline-flex; 
+  align-items: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.logoTextPrimary {
+  color: var(--text-on-dark-primary);
+}
+
+.logoTextAccent {
+  color: var(--text-on-dark-accent);
+  margin-left: 2px;
+}
+
+.tagline {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--text-on-dark-tertiary);
+}
+
+.links {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.link {
+  font-size: 0.875rem;
+  color: var(--text-on-dark-tertiary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.link:hover {
+  color: var(--text-on-dark-primary);
+}
+
+.bottomRow {
+  margin-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1.5rem;
+  text-align: center;
+}
+
+.copyright {
+  font-size: 0.75rem;
+  color: var(--text-on-dark-tertiary);
+}
+
+.socials {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.socialLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-on-dark-tertiary);
+  transition: all 0.2s ease;
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05); /* Subtle background for the icon */
+}
+
+.socialLink:hover {
+  color: var(--text-on-dark-accent);
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-3px);
+}
+
+/* Ensure the layout stacks nicely on mobile */
+@media (max-width: 768px) {
+  .topRow {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .links {
+    order: 2; /* Move main links below brand */
+  }
+  
+  .socials {
+    order: 3; /* Move icons to the bottom of the stack */
+  }
+}

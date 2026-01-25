@@ -1,0 +1,300 @@
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes floatReverse {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(12px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+.overviewSection {
+  min-height: calc(100vh - 300px);
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bg-primary);
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 5rem 1rem;
+  position: relative;
+  z-index: 10;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.grid > div:first-child {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: 9999px;
+  background: var(--badge-accent-primary-bg);
+  margin-bottom: 2rem;
+  color: var(--badge-accent-primary-text);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 4.5rem;
+  font-weight: 800;
+  margin-bottom: 2rem;
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+.textGradient {
+  background: linear-gradient(
+    90deg, 
+    var(--text-accent) 0%, 
+    var(--text-accent) 40%, 
+    #ffffff 50%, 
+    var(--text-accent) 60%, 
+    var(--text-accent) 100%
+  );
+  background-size: 200% auto;
+  color: var(--text-accent); 
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 5s linear infinite;
+  font-size: 4rem;
+}
+
+.description {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  max-width: 36rem;
+  opacity: 0;
+  animation: fadeInUp 0.8s ease-out 0.2s forwards; 
+}
+
+.btnContainer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  opacity: 0;
+  animation: fadeInUp 0.8s ease-out 0.4s forwards;
+}
+
+.btnPrimary, .btnSecondary {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btnPrimary {
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.btnPrimary:hover {
+  background-color: var(--btn-primary-bg-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.btnPrimary svg {
+  transition: transform 0.3s ease;
+}
+
+.btnPrimary:hover svg {
+  transform: translateX(4px);
+}
+
+.btnSecondary {
+  background-color: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
+  border: 1px solid var(--btn-secondary-border);
+}
+
+.btnSecondary:hover {
+  background-color: var(--btn-secondary-bg-hover);
+  border: 1px solid var(--btn-secondary-border-hover);
+  transform: translateY(-2px);
+}
+
+.featureList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  opacity: 0;
+  animation: fadeInUp 0.8s ease-out 0.6s forwards;
+}
+
+.featureItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  cursor: default;
+}
+
+.featureItem:hover {
+  transform: scale(1.05);
+  background: var(--bg-primary); 
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.featureIcon {
+  width: 16px;
+  height: 16px;  
+  color: var(--text-accent);
+}
+
+.visualShowcase {
+  position: relative;
+  height: 100%;
+  animation: fadeInUp 1s ease-out forwards;
+}
+
+.visualFrame {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  perspective: 1000px;
+}
+
+.visualImage {
+  position: relative;
+  z-index: 1;
+  display: block;
+  height: auto;
+  width: 100%;
+  object-fit: cover;
+  aspect-ratio: 10 / 11;
+  border-radius: 1.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); 
+  animation: float 6s ease-in-out infinite;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.visualImage:hover {
+  animation-play-state: paused;
+  transform: scale(1.02);
+  box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.3); 
+}
+
+.metricCard {
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; 
+  padding: 1rem;
+  border-radius: 1rem; 
+  border: 1px solid var(--border-light);
+  background-color: var(--bg-primary);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); 
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.metricCard:hover {
+  transform: scale(1.05);
+  box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.15);
+  z-index: 20;
+}
+
+.leftCard {
+  position: absolute;
+  top: 3rem; 
+  right: -2rem;
+  animation: floatReverse 7s ease-in-out infinite;
+  animation-delay: 0.5s;
+}
+
+.rightCard {
+  position: absolute;
+  bottom: 3rem; 
+  left: -2rem;
+  animation: float 8s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+.metricIconWrapper {
+  display: flex;
+  height: 2.5rem; 
+  width: 2.5rem; 
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  background-color: var(--badge-accent-primary-bg);
+}
+
+.metricIcon {
+  height: 1.25rem;
+  width: 1.25rem;
+  color: var(--badge-accent-primary-text);
+}
+
+.metricContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.metricLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.metricValue {
+  font-family: inherit; 
+  font-size: 1.25rem; 
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
