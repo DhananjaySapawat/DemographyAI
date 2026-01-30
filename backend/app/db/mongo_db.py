@@ -48,9 +48,10 @@ class MongoDatabase(BaseDatabase):
     # ----------------------------------------------------
 
     def mongo_to_json(self, cursor):
-        data = list(cursor)
+        item_list = list(cursor)
+        item_list_with_id = [item | {"id": str(item["_id"])} for item in item_list]
         return jsonable_encoder(
-            data,
+            item_list_with_id,
             custom_encoder={ObjectId: str}
         )
 

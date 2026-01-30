@@ -4,79 +4,91 @@ html {
   scroll-behavior: smooth;
 }
 
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+
 :root {
   /* ==============================
-     Brand Colors
+     Brand Colors (Modern AI)
   ============================== */
-  --color-brand-primary: #0f1729;
-  --color-brand-accent: #c00101;
+  --color-brand-primary: #1f2a44;   /* Deep blue-gray */
+  --color-brand-accent: #2563eb;    /* AI blue accent */
 
   /* ==============================
      Backgrounds / Surfaces
   ============================== */
-  --bg-theme-light:  rgba(15, 23, 41, 0.1);;
-  --bg-theme: #0f1729;
-  --bg-theme-hover: #131f40;
-  --bg-accent: #c00101;
-  --bg-accent-05: rgba(192, 1, 1, 0.05);
+  --bg-theme-light: rgba(37, 99, 235, 0.08);
+  --bg-theme: #1f2a44;
+  --bg-theme-hover: #27355a;
+
+  --bg-accent: #2563eb;
+  --bg-accent-05: rgba(37, 99, 235, 0.06);
 
   --bg-foreground: #ffffff;
-  --bg-primary: #fff;
-  --bg-secondary: #f6f8fc;
-
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;          /* Soft gray for sections */
+  --bg-tertiary: #eef2f7;           /* Cards / panels */
 
   /* ==============================
-     Text on Dark (Navy / Hero)
+     Text on Dark (Hero / Navbar)
   ============================== */
   --text-on-dark-primary: #ffffff;
-  --text-on-dark-secondary: #ffffffe6;
-  --text-on-dark-tertiary: #ffffffb2;
-  --text-on-dark-accent: #e30606;
-  --text-on-dark-accent-hover: #cc3333;  
+  --text-on-dark-secondary: rgba(255, 255, 255, 0.85);
+  --text-on-dark-tertiary: rgba(255, 255, 255, 0.65);
+  --text-on-dark-accent: #60a5fa;
+  --text-on-dark-accent-hover: #93c5fd;
 
   /* ==============================
      Text on Light (White Sections)
   ============================== */
-  --text-primary: #0f1729;
-  --text-secondary: #3d4555;
-  --text-muted: #6b7280;
+  --text-primary: #0f172a;           /* Main text */
+  --text-secondary: #334155;         /* Paragraphs */
+  --text-muted: #64748b;             /* Helper / meta text */
 
   /* ==============================
      Accent / Highlight Text
   ============================== */
-  --text-accent-light: #ff4d4d;
-  --text-accent: #c00101;
+  --text-accent-light: #60a5fa;
+  --text-accent: #2563eb;
 
   /* ==============================
-     Buttons – Primary (Red)
+     Buttons – Primary (Blue)
   ============================== */
-  --btn-primary-bg-light: rgba(255, 1, 1, 0.14);
-  --btn-primary-bg: #c00101;
-  --btn-primary-bg-hover: #a30101;
+  --btn-primary-bg-light: rgba(37, 99, 235, 0.12);
+  --btn-primary-bg: #2563eb;
+  --btn-primary-bg-hover: #1d4ed8;
   --btn-primary-text: #ffffff;
 
   /* ==============================
-     Buttons – Secondary (White)
+     Buttons – Secondary (Neutral)
   ============================== */
   --btn-secondary-bg: #ffffff;
-  --btn-secondary-bg-hover: #f1f3f7;
-  --btn-secondary-text: #0f1729;
-  --btn-secondary-border: #d1d5db;
-  --btn-secondary-border-hover: #9ca3af;
+  --btn-secondary-bg-hover: #f1f5f9;
+  --btn-secondary-text: #0f172a;
+  --btn-secondary-border: #dbe1ea;
+  --btn-secondary-border-hover: #c7cfdb;
 
   /* ==============================
-     Badge
+     Badge / Chips
   ============================== */
-   --badge-accent-primary-bg: rgba(192, 1, 1, 0.1);
-   --badge-accent-primary-bg-hover: rgba(192, 1, 1, 0.15);
-   --badge-accent-primary-text: #c00101;
+  --badge-accent-primary-bg: rgba(37, 99, 235, 0.12);
+  --badge-accent-primary-bg-hover: rgba(37, 99, 235, 0.18);
+  --badge-accent-primary-text: #2563eb;
 
   /* ==============================
      Borders / Dividers
   ============================== */
-  --border-light: #e5e7eb;
-  --border-default: #d1d5db;
-  --border-strong: #9ca3af;
-  --border-dark: #374151;
-  --border-accent: #c00101;
+  --border-light: #e5eaf1;
+  --border-default: #d6dde8;
+  --border-strong: #c1cad9;
+  --border-dark: #475569;
+  --border-accent: #2563eb;
 }

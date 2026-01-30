@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { Home, Image as ImageIcon, Camera, Video, Webcam } from "lucide-react";
+import { Home, Image as ImageIcon, Camera, Video, Radio } from "lucide-react";
 
 import NavLink from "@/src/components/layout/NavLink";
-import ThemeToggle from "@/src/components/layout/ThemeToggle";
 import styles from "@/src/styles/layout/header.module.css";
 
 export default function Header() {
@@ -49,12 +48,9 @@ export default function Header() {
 
             <li className={styles.navItem}>
               <NavLink href="/live-webcam" className={styles.navLink} activeClassName={styles.activeNavLink}>
-                <Webcam size={20} strokeWidth={2} />
+                <Radio size={20} strokeWidth={2} />
                 <span>Live Webcam</span>
               </NavLink>
-            </li>
-            <li className={styles.navItem}>
-              <ThemeToggle className={styles.themeToggle} iconWrapper={styles.iconWrapper} />
             </li>
           </ul>
         </nav>

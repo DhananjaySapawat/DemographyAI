@@ -1,0 +1,79 @@
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+.pageHero {
+  position: relative;
+  padding: 5rem 1.5rem 0 1.5rem;
+  overflow: hidden;
+}
+
+.heroInner {
+  position: relative;
+  max-width: 72rem;
+  margin: 0 auto;
+  margin-bottom: 2rem;
+  text-align: center;
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.heroBadge {
+  display: flex;
+  width: fit-content;
+  gap: 0.5rem;
+  padding: 10px 20px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  background: var(--badge-accent-primary-bg);
+  margin: auto;
+  margin-bottom: 0.5rem;
+  color: var(--badge-accent-primary-text);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.heroTitle {
+  font-size: 3.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.titleHighlight {
+  background: linear-gradient(
+    90deg, 
+    var(--text-accent) 0%, 
+    var(--text-accent) 40%, 
+    #ffffff 50%, 
+    var(--text-accent) 60%, 
+    var(--text-accent) 100%
+  );
+  background-size: 200% auto;
+  color: var(--text-accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 5s linear infinite;
+}
+
+.heroDescription {
+  margin: 0rem auto 0;
+  max-width: 42rem;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  opacity: 0.9;
+}

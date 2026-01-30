@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Analysis - DemographyAI</title>
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==============================
+           Global Reset & Variables 
+           (Inherited from Homepage)
+        ============================== */
+        :root {
+            --color-brand-primary: #1f2a44;
+            --color-brand-accent: #2563eb;
+            --bg-theme: #1f2a44;
+            --bg-theme-hover: #27355a;
+            --bg-accent: #2563eb;
+            --bg-accent-05: rgba(37, 99, 235, 0.06);
+            --bg-foreground: #ffffff;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #eef2f7;
+            --text-on-dark-primary: #ffffff;
+            --text-on-dark-secondary: rgba(255, 255, 255, 0.85);
+            --text-on-dark-tertiary: rgba(255, 255, 255, 0.65);
+            --text-on-dark-accent: #60a5fa;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+            --text-accent: #2563eb;
+            --border-light: #e5eaf1;
+            --border-default: #d6dde8;
+            --badge-bg: rgba(37, 99, 235, 0.1);
+            --badge-text: #2563eb;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', system-ui, sans-serif; color: var(--text-primary); background-color: var(--bg-secondary); line-height: 1.5; }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        img { max-width: 100%; display: block; }
+
+        /* Reuse Header Styles */
+        .header { background: var(--bg-theme); position: sticky; top: 0; width: 100%; z-index: 50; }
+        .header-container { max-width: 1280px; height: 5rem; margin: 0 auto; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+        .logo-text-primary { font-size: 1.5rem; font-weight: 700; color: var(--text-on-dark-primary); }
+        .logo-text-accent { font-size: 1.5rem; font-weight: 700; color: var(--text-on-dark-accent); margin-left: 2px; }
+        .nav-list { display: flex; align-items: center; gap: 0.25rem; }
+        .nav-link { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem; font-size: 0.875rem; font-weight: 500; border-radius: 0.5rem; color: var(--text-on-dark-secondary); transition: all 0.2s ease; }
+        .nav-link:hover { background-color: rgba(255, 255, 255, 0.1); color: var(--text-on-dark-primary); }
+        .nav-link.active { background: var(--bg-accent); color: var(--text-on-dark-primary); }
+
+        /* ==============================
+           ANALYSIS LAYOUT 
+        ============================== */
+        .main-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+            min-height: calc(100vh - 160px);
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+        
+        .page-desc {
+            color: var(--text-muted);
+            font-size: 1.125rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* UPLOAD ZONE */
+        .upload-section {
+            background: var(--bg-primary);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            margin-bottom: 2rem;
+            border: 2px dashed var(--border-default);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .upload-section:hover, .upload-section.dragover {
+            border-color: var(--text-accent);
+            background-color: var(--bg-accent-05);
+        }
+
+        .upload-icon {
+            color: var(--text-accent);
+            margin-bottom: 1.5rem;
+            background: var(--badge-bg);
+            padding: 1rem;
+            border-radius: 50%;
+            display: inline-flex;
+        }
+
+        .upload-input {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .btn-upload {
+            background-color: var(--color-brand-accent);
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            pointer-events: none; /* Let the input handle clicks */
+        }
+
+        /* PREVIEW AREA */
+        .preview-container {
+            display: none; /* Hidden by default */
+            margin-top: 3rem;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        @media (max-width: 1024px) {
+            .preview-container { grid-template-columns: 1fr; }
+        }
+
+        .original-image-card {
+            background: var(--bg-primary);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-light);
+            height: fit-content;
+        }
+
+        .original-image-wrapper {
+            width: 100%;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .original-image-wrapper img {
+            max-height: 500px;
+            object-fit: contain;
+        }
+
+        /* RESULTS GRID */
+        .results-area {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .face-card {
+            background: var(--bg-primary);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid var(--border-light);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            transition: transform 0.2s ease;
+        }
+
+        .face-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+            border-color: var(--text-accent);
+        }
+
+        .face-crop {
+            width: 100px;
+            height: 100px;
+            border-radius: 0.75rem;
+            object-fit: cover;
+            border: 2px solid var(--border-light);
+            flex-shrink: 0;
+        }
+
+        .face-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem 2rem;
+            width: 100%;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .stat-value {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .confidence-badge {
+            background: #dcfce7;
+            color: #166534;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: auto;
+        }
+
+        @media (max-width: 640px) {
+            .face-card { flex-direction: column; text-align: center; }
+            .face-stats { grid-template-columns: 1fr; gap: 1rem; }
+            .confidence-badge { display: none; }
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .loading-spinner {
+            display: none;
+            margin: 2rem auto;
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--bg-tertiary);
+            border-top: 4px solid var(--color-brand-accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-container">
+            <div class="logo-wrapper">
+                <a href="index.html" class="logo-link">
+                    <span class="logo-text-primary">Demography</span>
+                    <span class="logo-text-accent">AI</span>
+                </a>
+            </div>
+            <nav>
+                <ul class="nav-list">
+                    <li><a href="index.html" class="nav-link"><i data-lucide="home" size="20"></i><span>Home</span></a></li>
+                    <li><a href="#" class="nav-link active"><i data-lucide="image" size="20"></i><span>Image Analysis</span></a></li>
+                    <li><a href="#" class="nav-link"><i data-lucide="camera" size="20"></i><span>Camera Capture</span></a></li>
+                    <li><a href="#" class="nav-link"><i data-lucide="video" size="20"></i><span>Video Analysis</span></a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="main-container">
+        
+        <div class="page-header">
+            <h1 class="page-title">Upload Image for Analysis</h1>
+            <p class="page-desc">
+                Upload a clear photo containing one or more faces. 
+                Our AI will detect and crop faces, then analyze age, gender, emotion, and ethnicity.
+            </p>
+        </div>
+
+        <div class="upload-section" id="dropZone">
+            <input type="file" id="fileInput" class="upload-input" accept="image/*">
+            <div class="upload-icon">
+                <i data-lucide="cloud-upload" size="40"></i>
+            </div>
+            <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; color: var(--text-primary);">Click or Drag & Drop Image</h3>
+            <p style="color: var(--text-muted); font-size: 0.875rem;">Supports JPG, PNG, WEBP up to 10MB</p>
+            <div class="btn-upload">Select File</div>
+        </div>
+
+        <div class="loading-spinner" id="loader"></div>
+
+        <div class="preview-container" id="resultsContainer">
+            
+            <div>
+                <h3 style="margin-bottom: 1rem; color: var(--text-secondary);">Original Image</h3>
+                <div class="original-image-card">
+                    <div class="original-image-wrapper">
+                        <img id="uploadedImage" src="" alt="Uploaded preview">
+                    </div>
+                    <div style="margin-top: 1rem; display: flex; justify-content: space-between; font-size: 0.875rem; color: var(--text-muted);">
+                        <span><i data-lucide="file" size="14" style="display:inline; vertical-align:middle"></i> <span id="fileName">image.jpg</span></span>
+                        <span><i data-lucide="users" size="14" style="display:inline; vertical-align:middle"></i> 2 Faces Detected</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-area">
+                <div class="results-header">
+                    <h3 style="color: var(--text-secondary);">Analysis Results</h3>
+                    <button style="border:none; background:none; color:var(--text-accent); font-weight:600; cursor:pointer; font-size:0.875rem;">Download JSON</button>
+                </div>
+
+                <div class="face-card">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop" alt="Face 1" class="face-crop">
+                    <div class="face-stats">
+                        <div class="stat-item">
+                            <span class="stat-label"><i data-lucide="calendar" size="12"></i> Age</span>
+                            <span class="stat-value">24 - 28</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label"><i data-lucide="user" size="12"></i> Gender</span>
+                            <span class="stat-value">Male <span class="confidence-badge">99%</span></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label"><i data-lucide="smile" size="12"></i> Emotion</span>
+                            <span class="stat-value" style="color: #16a34a;">Happy</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label"><i data-lucide="globe" size="12"></i> Ethnicity</span>
+                            <span class="stat-value">South Asian</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="face-card">
+                    <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop" alt="Face 2" class="face-crop">
+                    <div class="face-stats">
+                        <div class="stat-item">
+                            <span class="stat-label"><i data-lucide="calendar" size="12"></i> Age</span>
+                            <span class="stat-value">30 - 35</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label"><i data-lucide="user" size="12"></i> Gender</span>
+                            <span class="stat-value">Female <span class="confidence-badge">98%</span></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label"><i data-lucide="meh" size="12"></i> Emotion</span>
+                            <span class="stat-value" style="color: var(--text-primary);">Neutral</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label"><i data-lucide="globe" size="12"></i> Ethnicity</span>
+                            <span class="stat-value">Caucasian</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const fileInput = document.getElementById('fileInput');
+        const dropZone = document.getElementById('dropZone');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const uploadedImage = document.getElementById('uploadedImage');
+        const fileNameDisplay = document.getElementById('fileName');
+        const loader = document.getElementById('loader');
+
+        // Drag & Drop visual feedback
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        // Click to upload
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            // Reset UI
+            resultsContainer.style.display = 'none';
+            loader.style.display = 'block';
+
+            // Simulate processing delay
+            setTimeout(() => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedImage.src = e.target.result;
+                    fileNameDisplay.textContent = file.name;
+                    
+                    loader.style.display = 'none';
+                    resultsContainer.style.display = 'grid'; // Show results
+                    
+                    // Smooth scroll to results
+                    resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+                reader.readAsDataURL(file);
+            }, 1500); // 1.5s fake delay
+        }
+    </script>
+
+</body>
+</html>

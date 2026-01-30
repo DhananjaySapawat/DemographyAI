@@ -1,0 +1,225 @@
+.dropzone {
+  animation: fadeInUp 0.6s ease both;
+  width: 42rem;
+  height: 23.25rem;
+  margin: auto;
+  cursor: pointer;
+  text-align: center;
+  padding: 3rem;
+  border-radius: 1.5rem;
+  border: 2px dashed var(--border-default);
+  background: var(--bg-foreground);
+  transition: all 0.25s ease;
+}
+
+.dropzone:hover {
+  border-color: var(--border-accent);
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.iconWrapper {
+  margin: 0 auto 1.5rem auto;
+  width: 5rem;
+  height: 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1rem;
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--text-accent);
+  transition: all 0.25s ease;
+}
+
+.dropzone:hover .iconWrapper {
+  transform: scale(1.1);
+  background: var(--bg-accent);
+  color: var(--text-on-dark-primary);
+}
+
+.title {
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.subtitle {
+  margin-bottom: 1.5rem;
+  color: var(--text-muted);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  height: 40px;
+  padding: 0 1rem;
+  border-radius: 0.5rem;
+  border: none;
+
+  font-size: 0.875rem;
+  font-weight: 500;
+
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.button:hover {
+  background: var(--btn-primary-bg-hover);
+}
+
+.button:active {
+  transform: scale(0.97);
+}
+
+.helperText {
+  margin-top: 1rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.errorText {
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #ef4444; 
+  animation: fadeInUp 0.3s ease both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+}
+
+.dropzoneError {
+  animation: shake 0.35s ease;
+}
+
+
+.successContainer {
+  animation: fadeInUp 0.6s ease both;
+  width: 42rem;
+  height: 23.25rem;
+  margin: auto;
+  cursor: pointer;
+  text-align: center;
+  padding: 3rem;
+  border-radius: 1.5rem;
+  border: 1px solid var(--border-light);
+  background: var(--bg-foreground);
+  transition: all 0.25s ease;
+}
+
+
+.successContainer:hover {
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.removeButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  height: 2.5rem;
+  width: 2.5rem;
+  border-radius: 9999px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(239, 68, 68, 0.12); 
+  color: #ef4444;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 2;
+}
+
+.removeButton:hover {
+  background: rgba(239, 68, 68, 0.22);
+  transform: scale(1.05);
+}
+
+.successContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.successIconContainer {
+  margin-bottom: 1.5rem;
+  height: 5rem;
+  width: 5rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--text-accent);
+}
+
+.successContainer:hover .successIconContainer {
+  transform: scale(1.1);
+  background: var(--bg-accent);
+  color: var(--text-on-dark-primary);
+}
+
+.fileName {
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  max-width: 100%;
+  padding: 0 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fileSize {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.analyzeButton {
+  margin-top: 1rem;
+  height: 3rem;
+  padding: 0 2rem;
+  border-radius: 0.5rem;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.analyzeButton:hover {
+  background: var(--btn-primary-bg-hover);
+  transform: translateY(-1px);
+}
+
