@@ -33,9 +33,12 @@ elif [ "$MODE" = "dev" ]; then
     bash -c "cd model && ./run.sh" &
     PID2=$!
 
-    bash -c "cd dummy_frontend && npm run dev" &
+    bash -c "cd frontend && npm run dev" &
     PID3=$!
 
-    wait $PID1 $PID2 $PID3
+    bash -c "cd dummy_frontend && npm run dev" &
+    PID4=$!
+
+    wait $PID1 $PID2 $PID3 $PID4
 
 fi

@@ -8,7 +8,7 @@ class ImageService:
             raise ValueError("File object is required")
         self.file = file  
         self.upload_type = upload_type
-        self.result = []
+        self.result = {"original_source": "", "faces": []}
 
     async def _read_file(self):
         try:
@@ -81,7 +81,7 @@ class ImageService:
         })
     
     def _add_result(self, face_url, face_attributes):
-        self.result.append({
+        self.result["faces"].append({
             "url": face_url,
             **face_attributes
         })
@@ -110,6 +110,7 @@ class ImageService:
 
             processed_image = self._get_processed_image()
             processed_image_upload = self._upload_image(processed_image)
+            self.result["original_source"] = processed_image_upload["url"]
             self._add_processed_image_record(processed_image_upload)
         
         except ValueError as e:

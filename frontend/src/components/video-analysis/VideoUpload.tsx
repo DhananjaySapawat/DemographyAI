@@ -1,16 +1,16 @@
 "use client";
 import { useState} from "react";
-import { uploadImage } from "@/src/lib/api";
+import { uploadVideo } from "@/src/lib/api";
 
 import FileUpload from "@/src/components/ui/FileUpload";
 import AnalysisResult from "@/src/components/ui/AnalysisResult";
 
 import styles from '@/src/styles/image-analysis/image-upload.module.css';
 
-export default function ImageUpload() {
+export default function VideoUpload() {
     type Status = 'idle' | 'analyzing' | 'success' | 'error';
 
-    const [imageResult, setImageResult] = useState<any>(null);
+    const [videoResult, setVideoResult] = useState<any>(null);
     const [status, setStatus] = useState<Status>('idle');    
     const [error, setError] = useState<string | null>(null);
 
@@ -18,8 +18,8 @@ export default function ImageUpload() {
         setStatus("analyzing"); 
         try {
             setError(null);
-            const response = await uploadImage(file);
-            setImageResult(response.result);
+            const response = await uploadVideo(file);
+            setVideoResult(response.result);
             setStatus("success"); 
 
         } catch (err) {
@@ -34,16 +34,16 @@ export default function ImageUpload() {
     }
 
     const changeFile = () => {
-        setImageResult(null);
+        setVideoResult(null);
         setStatus("idle");
     }
 
     return (
         <>
             <section className={styles.imageUploadSection}>
-                <FileUpload uploadFile={uploadFile} changeFile={changeFile} status={status} upload_error={error} />
+                <FileUpload uploadFile={uploadFile} changeFile={changeFile} status={status} upload_error={error} isVideo = {true} />
             </section>
-            { (status == 'analyzing' || status == 'success') && <AnalysisResult analysisResult={imageResult} /> } 
+            { (status == 'analyzing' || status == 'success') && <AnalysisResult analysisResult={videoResult} sourceType = "video"/> } 
         </>
     )
 }

@@ -46,6 +46,6 @@ async def detect_video_upload(file: UploadFile = File(...)):
     try :
         video_service = VideoService(file)
         video_url = await video_service.process_video()
-        return {"video_url": video_url}
+        return {"result": video_url}
     except Exception as e:
         return {"error": str(e)}

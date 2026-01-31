@@ -1,9 +1,6 @@
 "use client";
-
-import { useEffect, useState } from "react";
 import FaceCard from "@/src/components/ui/FaceCard";
-import { uploadImage } from "@/src/lib/api";
-import styles from "@/src/styles/image-analysis/image-result.module.css";
+import styles from "@/src/styles/ui/analysis-result.module.css";
 
 interface FaceData {
   id?: string | number;
@@ -11,53 +8,39 @@ interface FaceData {
 }
 
 interface AnalysisResponse {
-  face_count: number;
   faces: FaceData[];
-  original_img: string;
+  original_source: string;
 }
 
-export default function ImageResult({ file, setError, state, setState }: any) {
-  const [imageResult, setImageResult] = useState<AnalysisResponse | null>(null);
-
-  useEffect(() => {
-    if (!file) return;
-
-    const analyzeImage = async () => {
-      try {
-        setError(null);
-        const result = await uploadImage(file);
-        setImageResult(result);
-      } catch (err) {
-        console.error(err);
-        setError("Failed to analyze image.");
-      } finally {
-        console.log("Analysis complete");
-        setState("result");
-      }
-    };
-
-    analyzeImage();
-  }, [file]);
-
-  if (!file) return null;
-  if (state === "analyzing") return <LoadingImageResult styles={styles} />;
-  if (!imageResult) return null;
-
-  const { face_count, faces, original_img } = imageResult;
+export default function AnalysisResult({ analysisResult, sourceType }: { analysisResult: AnalysisResponse, sourceType?: string }) {
+  console.log(analysisResult);
+  const title = sourceType === 'video' ? "Source Video" : "Source Image";
+  if (!analysisResult) return <LoadingAnalysisResult styles={styles} title={title} />;
+  const { faces, original_source } = analysisResult;
 
   return (
     <div className={styles.resultContainer}>
 
-      <h2 className={styles.sectionTitle}>Source Image</h2>
+      <h2 className={styles.sectionTitle}>{title}</h2>
       <div className={styles.originalImageWrapper}>
-        <img
-          src={original_img}
-          alt="Uploaded image used for face analysis"
-          className={styles.originalImage}
-        />
+        {
+          sourceType == "video" ?  
+          <video className={styles.originalImage} controls>
+            <source src={original_source} type="video/webm" />
+            <source src={original_source} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+
+          :
+          <img
+            src={original_source}
+            alt="Uploaded image used for face analysis"
+            className={styles.originalImage}
+          />
+        }
       </div>
 
-      <h2 className={styles.sectionTitle}>Detected Faces ({face_count})</h2>
+      <h2 className={styles.sectionTitle}>Detected Faces ({faces?.length ?? 0})</h2>
       <div className={styles.facesGrid}>
         {faces?.length > 0 ? (
           faces.map((face, index) => (
@@ -71,10 +54,10 @@ export default function ImageResult({ file, setError, state, setState }: any) {
   );
 }
 
-function LoadingImageResult({styles}: any) {
+function LoadingAnalysisResult({styles, title}: any) {
   return (
     <div className={styles.resultContainer}>
-      <h2 className={styles.sectionTitle}>Source Image</h2>
+      <h2 className={styles.sectionTitle}>{title}</h2>
       <div className={styles.loadingImageWrapper}/>
 
       <h2 className={styles.sectionTitle}>Detecting Faces...</h2>

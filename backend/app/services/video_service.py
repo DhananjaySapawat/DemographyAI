@@ -55,14 +55,14 @@ class VideoService:
             if path and os.path.exists(path):
                 os.remove(path)
 
-    async def process_video(self) -> str:
+    async def process_video(self) -> dict:
         try:
             self._prepare_temp_paths()
             await self._save_uploaded_file()
             await self._transcode_video()
             self._upload_processed_video()
             self._add_video_record()
-            return self.video_url
+            return {'original_source' : self.video_url, 'faces' : [] }
         
         except Exception as e:
             print(f"{VideoService}: {e}")

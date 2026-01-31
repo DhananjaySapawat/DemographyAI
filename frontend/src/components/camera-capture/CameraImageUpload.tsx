@@ -1,8 +1,8 @@
 "use client";
 import { useState} from "react";
-import { uploadImage } from "@/src/lib/api";
+import { uploadSnapshot } from "@/src/lib/api";
 
-import FileUpload from "@/src/components/ui/FileUpload";
+import CameraStream from "@/src/components/camera-capture/CameraStream";
 import AnalysisResult from "@/src/components/ui/AnalysisResult";
 
 import styles from '@/src/styles/image-analysis/image-upload.module.css';
@@ -18,7 +18,7 @@ export default function ImageUpload() {
         setStatus("analyzing"); 
         try {
             setError(null);
-            const response = await uploadImage(file);
+            const response = await uploadSnapshot(file);
             setImageResult(response.result);
             setStatus("success"); 
 
@@ -41,7 +41,7 @@ export default function ImageUpload() {
     return (
         <>
             <section className={styles.imageUploadSection}>
-                <FileUpload uploadFile={uploadFile} changeFile={changeFile} status={status} upload_error={error} />
+                <CameraStream uploadFile={uploadFile} changeFile={changeFile} status={status} upload_error={error} />
             </section>
             { (status == 'analyzing' || status == 'success') && <AnalysisResult analysisResult={imageResult} /> } 
         </>

@@ -1,0 +1,374 @@
+.cameraContainer {
+  animation: fadeInUp 0.6s ease both;
+  width: 100%;
+  max-width: 968px;
+  height: fit-content;
+  margin: auto;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 1.5rem;
+  border: 1px solid var(--border-light);
+  background: var(--bg-foreground);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.cameraContainer:hover::before {
+  opacity: 1;
+}
+
+.cameraContainer:hover {
+  border-color: var(--border-accent);
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.04), 
+    0 8px 24px -4px rgba(0, 0, 0, 0.08),
+    0 20px 40px -10px rgba(99, 102, 241, 0.15),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+  transform: translateY(-2px);
+}
+
+.cameraWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--bg-tertiary);
+  border-radius: 1.5rem 1.5rem 0 0;
+}
+
+.placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  z-index: 1;
+}
+
+.cameraIcon {
+  width: 6rem;
+  height: 6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1.5rem;
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--text-accent);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  backdrop-filter: blur(10px);
+}
+
+.cameraIcon::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 1.5rem;
+  background: linear-gradient(45deg, transparent, rgba(99, 102, 241, 0.3), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.cameraContainer:hover .cameraIcon {
+  transform: scale(1.1) rotate(5deg);
+  background: var(--bg-accent);
+  color: var(--text-on-dark-primary);
+  box-shadow: 
+    0 10px 25px -5px rgba(99, 102, 241, 0.4),
+    0 0 0 1px rgba(99, 102, 241, 0.1);
+}
+
+.cameraContainer:hover .cameraIcon::after {
+  opacity: 1;
+}
+
+.placeholderTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+}
+
+.placeholderText {
+  font-size: 1rem;
+  color: var(--text-muted);
+  transition: all 0.3s ease;
+}
+
+.cameraContainer:hover .placeholderText {
+  color: var(--text-secondary);
+  transform: translateY(-2px);
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.video:hover {
+  transform: scale(1.02);
+}
+
+.capturedImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: fadeInScale 0.5s ease both;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.capturedImage:hover {
+  transform: scale(1.02);
+}
+
+.hiddenCanvas {
+  display: none;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.controls {
+  padding: 1rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 2;
+}
+
+.primaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 3rem;
+  padding: 0 2rem;
+  border-radius: 0.5rem;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.primaryBtn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.primaryBtn:hover::before {
+  width: 400px;
+  height: 400px;
+}
+
+.primaryBtn:hover {
+  background: var(--btn-primary-bg-hover);
+  transform: translateY(-3px);
+  box-shadow: 
+    0 8px 20px -4px rgba(99, 102, 241, 0.4),
+    0 0 0 1px rgba(99, 102, 241, 0.1),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+}
+
+.primaryBtn:active {
+  transform: translateY(-1px) scale(0.98);
+  box-shadow: 
+    0 4px 12px -2px rgba(99, 102, 241, 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.analyzeButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 3rem;
+  padding: 0 2rem;
+  border-radius: 0.5rem;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.analyzeButton::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.analyzeButton:hover::before {
+  width: 400px;
+  height: 400px;
+}
+
+.analyzeButton:hover {
+  background: var(--btn-primary-bg-hover);
+  transform: translateY(-3px);
+  box-shadow: 
+    0 8px 20px -4px rgba(99, 102, 241, 0.4),
+    0 0 0 1px rgba(99, 102, 241, 0.1),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+}
+
+.analyzeButton:active {
+  transform: translateY(-1px) scale(0.98);
+  box-shadow: 
+    0 4px 12px -2px rgba(99, 102, 241, 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.analyzeButton.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.secondaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 3rem;
+  padding: 0 2rem;
+  border-radius: 0.5rem;
+  border: 2px solid var(--border-default);
+  font-size: 1rem;
+  font-weight: 600;
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.secondaryBtn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.1);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.secondaryBtn:hover::before {
+  width: 400px;
+  height: 400px;
+}
+
+.secondaryBtn:hover {
+  border-color: var(--border-accent);
+  color: var(--text-accent);
+  background: rgba(99, 102, 241, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 4px 12px -2px rgba(99, 102, 241, 0.2),
+    0 0 0 1px rgba(99, 102, 241, 0.1);
+}
+
+.secondaryBtn:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 
+    0 2px 8px -2px rgba(99, 102, 241, 0.15),
+    inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.errorText {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #ef4444;
+  animation: fadeInUp 0.3s ease both;
+  text-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

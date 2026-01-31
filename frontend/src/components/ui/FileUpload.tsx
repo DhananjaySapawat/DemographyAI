@@ -1,25 +1,28 @@
 "use client";
 
 import { useRef, useState } from 'react';
-import { Upload, X, CircleCheckBig, Sparkles, RefreshCw} from 'lucide-react';
+import { Upload, Video, X, CircleCheckBig, Sparkles, RefreshCw} from 'lucide-react';
 import styles from '@/src/styles/ui/file-upload.module.css';
 
-export default function FileUpload( {file, setFile, state, setState, uploadError} : any ) {
+export default function FileUpload( {uploadFile, changeFile, status, upload_error, isVideo} : any ) {
 
+  const [file, setFile] = useState<File | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
-  const MAX_SIZE_MB = 1;
-  const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
+  const MAX_SIZE_MB = isVideo ? 25 : 10; 
+  const ACCEPTED_TYPES = isVideo ? ["video/mp4", "video/webm"] : ["image/jpeg", "image/png", "image/webp"]; 
+
 
 
   const validateFile = (selectedFile: File) => {
     if (!ACCEPTED_TYPES.includes(selectedFile.type)) {
-      return "Only JPG, PNG, and WebP images are allowed.";
+      return isVideo ? "Only MP4 and Webm videos are allowed." : "Only JPG, PNG, and WebP images are allowed.";
     }
 
     if (selectedFile.size > MAX_SIZE_MB * 1024 * 1024) {
-      return "File must be smaller than 10MB.";
+      return `File must be smaller than ${MAX_SIZE_MB}MB.`;
     }
 
     return null;
@@ -34,17 +37,18 @@ export default function FileUpload( {file, setFile, state, setState, uploadError
 
     setError(null);
     setFile(selectedFile);
+    changeFile();
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
       handleFile(e.target.files[0]);
-      setState("upload");
     }
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     if (e.dataTransfer.files?.[0]) {
       handleFile(e.dataTransfer.files[0]);
     }
@@ -52,6 +56,7 @@ export default function FileUpload( {file, setFile, state, setState, uploadError
 
 
   const removeFile = () => {
+    changeFile();
     setFile(null);
     setError(null);
     if (fileInputRef.current) {
@@ -61,21 +66,21 @@ export default function FileUpload( {file, setFile, state, setState, uploadError
 
   return (
     <>
-    {(!file && state == 'upload') && < FileUploader styles={styles} error={error} fileInputRef={fileInputRef} handleDrop={handleDrop} handleFileChange={handleFileChange} />}
-    {(file && state != 'result') && < AnalyzeContainer styles={styles} removeFile={removeFile} file={file} state={state} setState={setState} uploadError={uploadError} />}
-    {state == 'result' && <SuccessContainer styles={styles} fileInputRef={fileInputRef} />}    
+    {(!file && status == 'idle') && < FileUploader styles={styles} error={error} fileInputRef={fileInputRef} handleDrop={handleDrop} handleFileChange={handleFileChange} isVideo={isVideo} maxSize={MAX_SIZE_MB} />}
+    {(file && status !='success' ) && < AnalyzeContainer styles={styles} removeFile={removeFile} file={file} uploadFile={uploadFile} status={status} upload_error={upload_error} isVideo={isVideo} />}
+    {status == 'success' && <SuccessContainer styles={styles} fileInputRef={fileInputRef} isVideo={isVideo} />}    
     <input
       type="file"
       ref={fileInputRef}
       onChange={handleFileChange}
       style={{ display: 'none' }} 
-      accept=".jpg,.jpeg,.png,.webp"
+      accept={isVideo ? ".mp4,.webm" : ".jpg,.jpeg,.png,.webp"} 
     />
 </>
   );
 }
 
-function FileUploader({styles, error, fileInputRef, handleDrop}: any) {
+function FileUploader({styles, error, fileInputRef, handleDrop, isVideo, maxSize}: any) {
   return (
       <div
           className={`${styles.dropzone} ${error ? styles.dropzoneError : ""}`}
@@ -85,19 +90,19 @@ function FileUploader({styles, error, fileInputRef, handleDrop}: any) {
         >
 
         <div className={styles.iconWrapper}>
-          <Upload size={40} />
+          {isVideo ? <Video size={40} /> : <Upload size={40} />}
         </div>
 
-        <h3 className={styles.title}>Drag & drop your image here</h3>
+        <h3 className={styles.title}>Drag & drop your {isVideo ? "video" : "image"} here</h3>
         <p className={styles.subtitle}>or click to browse files</p>
 
         <button className={styles.button}>
           <Upload size={18} />
-          Select Image
+          Select {isVideo ? "Video" : "Image"} 
         </button>
 
         <p className={styles.helperText}>
-          Supports JPG, PNG, WebP up to 10MB
+          Supports {isVideo ? "MP4, WEBM" : "JPG, PNG, WebP"} up to {maxSize}MB 
         </p>
 
         {error && <p className={styles.errorText}>{error}</p>}
@@ -105,10 +110,13 @@ function FileUploader({styles, error, fileInputRef, handleDrop}: any) {
   )
 }
 
-function AnalyzeContainer({styles, removeFile, file, state, setState, uploadError}: any) {
+function AnalyzeContainer({styles, removeFile, file, status, uploadFile, upload_error, isVideo}: any) {
   return (
     <div className={styles.successContainer}>
-      <button className={styles.removeButton} onClick={() => state === "upload" && removeFile()}>
+      <button 
+        className={`${styles.removeButton} ${status === "analyzing" ? "pointer-events-none" : ""}`} 
+        onClick={() => status != "analyzing" && removeFile()}
+      >
         <X size={18} />
       </button>
 
@@ -122,17 +130,19 @@ function AnalyzeContainer({styles, removeFile, file, state, setState, uploadErro
           {(file.size / (1024 * 1024)).toFixed(2)} MB
         </span>
 
-        <button className={styles.analyzeButton} onClick={() => setState("analyzing")}>
-          {state == "analyzing" ? "Analyzing..." : "Analyze Image"}
+        <button 
+          className={`${styles.analyzeButton} ${status === "analyzing" ? "pointer-events-none" : ""}`} 
+          onClick={() => uploadFile(file)}>
+          {status == "analyzing" ? "Analyzing..." : `Analyze ${isVideo ? "Video" : "Image"}`}
         </button>
 
-        {uploadError && <p className={styles.errorText}>{uploadError}</p>}
+        {status =="error" && <p className={styles.errorText}>{upload_error}</p>}
       </div>
     </div>
   )
 }
 
-function SuccessContainer({ styles, fileInputRef }: any) {
+function SuccessContainer({ styles, fileInputRef, isVideo }: any) {
   return (
     <div className={styles.successContainer}>
       <div className={styles.successContent}>
@@ -142,11 +152,11 @@ function SuccessContainer({ styles, fileInputRef }: any) {
 
         <p className={styles.fileName}>Analysis Complete</p>
         <span className={styles.fileSize}>
-          Your image has been processed successfully
+          Your {isVideo ? "video" : "image"} has been processed successfully 
         </span>
 
-        <button className={styles.analyzeButton} onClick={() => fileInputRef.current?.click()}>
-           <RefreshCw size={18} /> Analyze Another Image
+        <button className={styles.analyzeButton} onClick={() => {fileInputRef.current?.click();}}>
+           <RefreshCw size={18} /> Analyze Another {isVideo ? "Video" : "Image"} 
         </button>
       </div>
     </div>
