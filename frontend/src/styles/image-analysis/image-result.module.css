@@ -1,5 +1,4 @@
 :root {
-  /* Adding a few modern variables for the 'Glass' look */
   --glass-bg: rgba(255, 255, 255, 0.03);
   --glass-border: rgba(255, 255, 255, 0.1);
   --glow-color: rgba(var(--text-accent-rgb), 0.2);
@@ -7,47 +6,18 @@
 
 .resultContainer {
   width: 100%;
-  max-width: 1280px; /* Changed to max-width for better responsiveness */
-  margin: 0 auto;
-  padding: 2rem 1.5rem;
-  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1); /* Smoother curve */
+  max-width: 1280px;
+  margin: 0 auto 3rem auto;
+  padding: 0rem 1.5rem;
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.summaryTitle {
-  font-size: 2.5rem; /* Slightly larger for impact */
-  font-weight: 800;
-  text-align: center;
-  background: linear-gradient(
-    to right, 
-    var(--text-accent), 
-    #ffffff, 
-    var(--text-accent)
-  );
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: shimmer 4s linear infinite;
-  margin-bottom: 0.75rem;
-  letter-spacing: -0.04em; /* Tighter tracking is very 'modern' */
-}
-
-.summaryText {
-  font-size: 1.1rem;
-  text-align: center;
-  color: var(--text-secondary);
-  opacity: 0.8;
-  font-weight: 400;
-  margin-bottom: 3rem;
-}
-
-/* The Modern Image Stage */
 .originalImageWrapper {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px); /* Modern frosted glass effect */
-  -webkit-backdrop-filter: blur(12px);
+  background: var(--bg-foreground);
+  backdrop-filter: blur(12px) saturate(180%); 
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
   border: 1px solid var(--glass-border);
-  border-radius: 1.5rem; /* Rounder corners */
+  border-radius: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -55,48 +25,346 @@
   overflow: hidden;
   margin-bottom: 3rem;
   aspect-ratio: 16 / 9;
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), 
+              box-shadow 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+              border-color 0.4s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08),
+              0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.originalImageWrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transition: left 0.6s ease;
+}
+
+.originalImageWrapper:hover::before {
+  left: 100%;
 }
 
 .originalImageWrapper:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.15),
+              0 8px 24px rgba(0, 0, 0, 0.08),
+              0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .originalImageWrapper img {
-  width: 100%;
+  width: auto;
   height: 100%;
-  object-fit: cover; /* Ensures the image fills the 16:9 ratio modernly */
+  margin: auto;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+              filter 0.4s ease;
+  filter: brightness(1) contrast(1);
 }
 
-/* The Bento Grid Style */
+.originalImageWrapper:hover img {
+  transform: scale(1.02);
+  filter: brightness(1.05) contrast(1.05);
+}
+
+.sectionTitle {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  position: relative;
+}
+
+.sectionTitle::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 4rem;
+  height: 4px;
+  background: linear-gradient(90deg, var(--bg-accent) 0%, rgba(99, 102, 241, 0.3) 100%);
+  border-radius: 2px;
+}
+
 .facesGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid */
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+  gap: 1rem;
   margin-top: 1rem;
 }
 
-/* Add this to your items inside .facesGrid for the effect */
-.facesGrid > div {
-  background: var(--bg-foreground);
-  border-radius: 1.25rem;
-  padding: 0.5rem;
-  border: 1px solid var(--border-default);
-  transition: all 0.3s ease;
-}
-
-.facesGrid > div:hover {
-  border-color: var(--text-accent);
-  transform: scale(1.02);
-}
-
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { 
+    opacity: 0; 
+    transform: translateY(30px) scale(0.98); 
+    filter: blur(4px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+    filter: blur(0);
+  }
+}
+
+@keyframes expandWidth {
+  from { width: 0; opacity: 0; }
+  to { width: 4rem; opacity: 1; }
 }
 
 @keyframes shimmer {
   0% { background-position: 200% center; }
-  100% { background-position: 0% center; }
+  100% { background-position: -200% center; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Loading state styles */
+.loadingImageWrapper {
+  background: var(--bg-foreground);
+  backdrop-filter: blur(12px) saturate(180%); 
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border-radius: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 3rem;
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(
+    110deg,
+    var(--bg-foreground) 0%,
+    rgba(255, 255, 255, 0.08) 45%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(255, 255, 255, 0.08) 55%,
+    var(--bg-foreground) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+.loadingImageWrapper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(99, 102, 241, 0.05) 0%,
+    transparent 70%
+  );
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.loadingfacesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+/* Loading Face Card */
+.loadingCardGroup {
+  display: flex; 
+  flex-direction: row;
+  overflow: hidden;
+  padding: 0.5rem;
+  border-radius: 1.25rem;
+  border: 1px solid #e2e8f0; 
+  background-color: #ffffff; 
+  max-width: 440px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04),
+              0 1px 4px rgba(0, 0, 0, 0.02);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.loadingCardGroup::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.5),
+    transparent
+  );
+  animation: cardShimmer 2s ease-in-out infinite;
+}
+
+@keyframes cardShimmer {
+  0% { left: -100%; }
+  100% { left: 150%; }
+}
+
+.loadingCardGroup .loadingImageWrapper {
+  position: relative;
+  width: 180px; 
+  height: 180px; 
+  padding: 1rem;
+  flex-shrink: 0;
+  overflow: hidden;
+  margin-bottom: 0;
+  aspect-ratio: 1;
+  border-radius: 0.75rem;
+}
+
+.loadingImage {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(
+    110deg,
+    #f1f5f9 0%,
+    #e2e8f0 45%,
+    #f8fafc 50%,
+    #e2e8f0 55%,
+    #f1f5f9 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+  border-radius: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.loadingImage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255, 255, 255, 0.3) 0%,
+    transparent 60%
+  );
+}
+
+.loadingDetailsContent {
+  padding: 1rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.loadingHeader {
+  margin-bottom: 0.75rem;
+}
+
+.loadingTitle {
+  height: 1rem;
+  width: 4rem;
+  background: linear-gradient(
+    110deg,
+    #f1f5f9 0%,
+    #e2e8f0 45%,
+    #f8fafc 50%,
+    #e2e8f0 55%,
+    #f1f5f9 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.loadingInfoList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.loadingInfoItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: fadeInUp 0.6s ease backwards;
+}
+
+.loadingInfoItem:nth-child(1) { animation-delay: 0.1s; }
+.loadingInfoItem:nth-child(2) { animation-delay: 0.2s; }
+.loadingInfoItem:nth-child(3) { animation-delay: 0.3s; }
+
+.loadingIcon {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    #dbeafe 0%,
+    #bfdbfe 50%,
+    #93c5fd 100%
+  );
+  background-size: 200% 200%;
+  animation: shimmer 2s ease-in-out infinite,
+             pulse 2s ease-in-out infinite;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.loadingLabel {
+  height: 0.875rem;
+  width: 3.5rem;
+  background: linear-gradient(
+    110deg,
+    #f1f5f9 0%,
+    #e2e8f0 45%,
+    #f8fafc 50%,
+    #e2e8f0 55%,
+    #f1f5f9 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+  border-radius: 0.25rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.loadingValue {
+  height: 0.875rem;
+  width: 4.5rem;
+  background: linear-gradient(
+    110deg,
+    #f1f5f9 0%,
+    #e2e8f0 45%,
+    #f8fafc 50%,
+    #e2e8f0 55%,
+    #f1f5f9 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+  border-radius: 0.25rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Modern utility animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+/* Smooth scroll behavior */
+@media (prefers-reduced-motion: no-preference) {
+  .resultContainer * {
+    scroll-behavior: smooth;
+  }
+}
+
+/* High performance mode for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .resultContainer *,
+  .resultContainer *::before,
+  .resultContainer *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

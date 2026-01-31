@@ -1,13 +1,14 @@
 "use client";
 
 import { useRef, useState } from 'react';
-import { Upload, X, CircleCheckBig } from 'lucide-react';
+import { Upload, X, CircleCheckBig, Sparkles, RefreshCw} from 'lucide-react';
 import styles from '@/src/styles/ui/file-upload.module.css';
 
-export default function FileUpload( {file, setFile, setAnalyze} : any ) {
+export default function FileUpload( {file, setFile, state, setState, uploadError} : any ) {
+
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
-
   const MAX_SIZE_MB = 1;
   const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
@@ -38,6 +39,7 @@ export default function FileUpload( {file, setFile, setAnalyze} : any ) {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
       handleFile(e.target.files[0]);
+      setState("upload");
     }
   };
 
@@ -59,7 +61,22 @@ export default function FileUpload( {file, setFile, setAnalyze} : any ) {
 
   return (
     <>
-    {!file ? (
+    {(!file && state == 'upload') && < FileUploader styles={styles} error={error} fileInputRef={fileInputRef} handleDrop={handleDrop} handleFileChange={handleFileChange} />}
+    {(file && state != 'result') && < AnalyzeContainer styles={styles} removeFile={removeFile} file={file} state={state} setState={setState} uploadError={uploadError} />}
+    {state == 'result' && <SuccessContainer styles={styles} fileInputRef={fileInputRef} />}    
+    <input
+      type="file"
+      ref={fileInputRef}
+      onChange={handleFileChange}
+      style={{ display: 'none' }} 
+      accept=".jpg,.jpeg,.png,.webp"
+    />
+</>
+  );
+}
+
+function FileUploader({styles, error, fileInputRef, handleDrop}: any) {
+  return (
       <div
           className={`${styles.dropzone} ${error ? styles.dropzoneError : ""}`}
           onClick={() => fileInputRef.current?.click()}
@@ -84,38 +101,54 @@ export default function FileUpload( {file, setFile, setAnalyze} : any ) {
         </p>
 
         {error && <p className={styles.errorText}>{error}</p>}
+    </div>
+  )
+}
 
-        <input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleFileChange}
-          style={{ display: 'none' }} 
-          accept=".jpg,.jpeg,.png,.webp"
-        />
-      </div>
-      ) : ( 
-        <div className={styles.successContainer}>
-          <button className={styles.removeButton} onClick={() => removeFile()} >
-            <X size={18} />
-          </button>
+function AnalyzeContainer({styles, removeFile, file, state, setState, uploadError}: any) {
+  return (
+    <div className={styles.successContainer}>
+      <button className={styles.removeButton} onClick={() => state === "upload" && removeFile()}>
+        <X size={18} />
+      </button>
 
-          <div className={styles.successContent}>
-            <div className={styles.successIconContainer}>
-              <CircleCheckBig size={40} />
-            </div>
-
-            <p className={styles.fileName}>{file?.name}</p>
-            <span className={styles.fileSize}>
-              {(file.size / (1024 * 1024)).toFixed(2)} MB
-            </span>
-
-            <button className={styles.analyzeButton} onClick={() => setAnalyze(true)}>
-              Analyze Image
-            </button>
-          </div>
+      <div className={styles.successContent}>
+        <div className={styles.successIconContainer}>
+          <CircleCheckBig size={40} />
         </div>
-      )}
 
-    </>
-  );
+        <p className={styles.fileName}>{file?.name}</p>
+        <span className={styles.fileSize}>
+          {(file.size / (1024 * 1024)).toFixed(2)} MB
+        </span>
+
+        <button className={styles.analyzeButton} onClick={() => setState("analyzing")}>
+          {state == "analyzing" ? "Analyzing..." : "Analyze Image"}
+        </button>
+
+        {uploadError && <p className={styles.errorText}>{uploadError}</p>}
+      </div>
+    </div>
+  )
+}
+
+function SuccessContainer({ styles, fileInputRef }: any) {
+  return (
+    <div className={styles.successContainer}>
+      <div className={styles.successContent}>
+        <div className={styles.successIconContainer}>
+          <Sparkles size={40} />
+        </div>
+
+        <p className={styles.fileName}>Analysis Complete</p>
+        <span className={styles.fileSize}>
+          Your image has been processed successfully
+        </span>
+
+        <button className={styles.analyzeButton} onClick={() => fileInputRef.current?.click()}>
+           <RefreshCw size={18} /> Analyze Another Image
+        </button>
+      </div>
+    </div>
+  )
 }

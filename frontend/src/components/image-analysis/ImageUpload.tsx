@@ -7,13 +7,14 @@ import styles from '@/src/styles/image-analysis/image-upload.module.css';
 
 export default function ImageUpload() {
     const [file, setFile] = useState(null);
-    const [analyze, setAnalyze] = useState(false);
+    const [state, setState] = useState<'upload' | 'analyzing' | 'result'>('upload');
+    const [error, setError] = useState<string | null>(null);
     return (
         <>
             <section className={styles.imageUploadSection}>
-                <FileUpload file={file} setFile={setFile} setAnalyze={setAnalyze}/>
+                <FileUpload file={file} setFile={setFile} state={state} setState={setState} uploadError={error} />
             </section>
-            { analyze && file && <ImageResult file={file} /> } 
+            { (state == 'analyzing' || state == 'result') && file && <ImageResult file={file} state={state} setState={setState} setError={setError} /> } 
         </>
     )
 }
