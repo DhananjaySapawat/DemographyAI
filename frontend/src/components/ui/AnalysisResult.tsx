@@ -13,7 +13,6 @@ interface AnalysisResponse {
 }
 
 export default function AnalysisResult({ analysisResult, sourceType }: { analysisResult: AnalysisResponse, sourceType?: string }) {
-  console.log(analysisResult);
   const title = sourceType === 'video' ? "Source Video" : "Source Image";
   if (!analysisResult) return <LoadingAnalysisResult styles={styles} title={title} />;
   const { faces, original_source } = analysisResult;
