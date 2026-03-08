@@ -1,11 +1,16 @@
 import sqlite3
 from .base import BaseDatabase
 
+
 class SQLiteDatabase(BaseDatabase):
 
     def __init__(self, db_path: str = "demographyAI.db"):
         self.db_path = db_path
         self._init_db()
+
+    # ----------------------------------------------------------
+    # internal helpers
+    # ----------------------------------------------------------
 
     def _get_connection(self):
         """Creates a connection with Row factory for dict-like access."""
@@ -14,155 +19,279 @@ class SQLiteDatabase(BaseDatabase):
         return conn
 
     def _init_db(self):
-        """Initialize the relational schema."""
-        with self._get_connection() as conn:
+        """
+        Creates all tables if they don't already exist.
+        Safe to call repeatedly — uses IF NOT EXISTS throughout.
+        Table order respects foreign-key dependencies:
+          requests → images → faces
+                   → processed_images
+          requests → videos → video_faces
+        """
+        conn = self._get_connection()
+        try:
             cursor = conn.cursor()
-            
-            # 1. Image Data Table
+
+            # enforce FK constraints (SQLite disables them by default)
+            cursor.execute("PRAGMA foreign_keys = ON")
+
+            # ── requests ──────────────────────────────────────────────
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS requests (
+                    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+                    request_id          TEXT    NOT NULL UNIQUE,
+                    endpoint            TEXT,
+                    upload_type         TEXT,
+                    ip_address          TEXT,
+                    user_agent          TEXT,
+                    status              TEXT,
+                    error_message       TEXT,
+                    processing_time_ms  INTEGER,
+                    country_code        TEXT,
+                    country_name        TEXT,
+                    state               TEXT,
+                    city                TEXT,
+                    -- image-only fields (NULL for video requests)
+                    face_count          INTEGER,
+                    image_width         INTEGER,
+                    image_height        INTEGER,
+                    -- shared
+                    file_size           INTEGER,
+                    error_step          TEXT,
+                    created_at          DATETIME
+                )
+            """)
+
+            # ── images ────────────────────────────────────────────────
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS images (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    url TEXT,
-                    public_id TEXT,
-                    type TEXT,
-                    face_count INTEGER,
-                    size INTEGER
+                    id                      INTEGER PRIMARY KEY AUTOINCREMENT,
+                    request_id              TEXT REFERENCES requests(request_id),
+                    public_id               TEXT,
+                    image_url               TEXT,
+                    original_filename       TEXT,
+                    mime_type               TEXT,
+                    image_hash              TEXT,
+                    width                   INTEGER,
+                    height                  INTEGER,
+                    size                    INTEGER,
+                    face_count              INTEGER,
+                    face_detection_time_ms  INTEGER,
+                    inference_time_ms       INTEGER,
+                    model_version           TEXT,
+                    created_at              DATETIME
                 )
             """)
 
-            # 2. Processed Image Data Table
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS processed_images (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    original_id INTEGER,
-                    url TEXT,
-                    public_id TEXT,
-                    type TEXT,
-                    face_count INTEGER,
-                    size INTEGER,
-                    FOREIGN KEY(original_id) REFERENCES images(id)
-                )
-            """)
-
-            # 3. Face Data Table
+            # ── faces (image faces) ───────────────────────────────────
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS faces (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    image_id INTEGER,
-                    public_id TEXT,
-                    url TEXT,
-                    age_v1 TEXT,
-                    age_v2 TEXT,
-                    gender TEXT,
-                    ethnicity TEXT,
-                    emotion TEXT,
-                    FOREIGN KEY(image_id) REFERENCES images(id)
+                    id                   INTEGER PRIMARY KEY AUTOINCREMENT,
+                    image_id             INTEGER REFERENCES images(id),
+                    public_id            TEXT,
+                    image_url            TEXT,
+                    face_index           INTEGER,
+                    face_x               INTEGER,
+                    face_y               INTEGER,
+                    face_width           INTEGER,
+                    face_height          INTEGER,
+                    age_v1               TEXT,
+                    age_v1_confidence    REAL,
+                    age_v2               TEXT,
+                    age_v2_confidence    REAL,
+                    gender               TEXT,
+                    gender_confidence    REAL,
+                    ethnicity            TEXT,
+                    ethnicity_confidence REAL,
+                    emotion              TEXT,
+                    emotion_confidence   REAL,
+                    model_version        TEXT,
+                    created_at           DATETIME
                 )
             """)
 
-            # 4. Video Data Table
+            # ── processed_images ──────────────────────────────────────
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS processed_images (
+                    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                    original_id INTEGER REFERENCES images(id),
+                    public_id   TEXT,
+                    image_url   TEXT,
+                    created_at  DATETIME
+                )
+            """)
+
+            # ── videos ────────────────────────────────────────────────
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS videos (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    url TEXT,
-                    size INTEGER
+                    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+                    request_id          TEXT REFERENCES requests(request_id),
+                    video_url           TEXT,
+                    original_filename   TEXT,
+                    mime_type           TEXT,
+                    original_format     TEXT,
+                    processed_format    TEXT,
+                    file_size           INTEGER,
+                    video_hash          TEXT,
+                    width               INTEGER,
+                    height              INTEGER,
+                    fps                 REAL,
+                    total_frames        INTEGER,
+                    duration_seconds    REAL,
+                    faces_detected      INTEGER,
+                    frames_with_faces   INTEGER,
+                    max_faces_in_frame  INTEGER,
+                    model_version       TEXT,
+                    transcode_time_ms   INTEGER,
+                    inference_time_ms   INTEGER,
+                    created_at          DATETIME
                 )
             """)
+
+            # ── video_faces ───────────────────────────────────────────
+            # Mirrors the faces table but belongs to a video row and
+            # adds frame_idx / face_idx instead of face_index.
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS video_faces (
+                    id                   INTEGER PRIMARY KEY AUTOINCREMENT,
+                    video_id             INTEGER REFERENCES videos(id),
+                    public_id            TEXT,
+                    image_url            TEXT,
+                    frame_idx            INTEGER,
+                    face_idx             INTEGER,
+                    face_x               INTEGER,
+                    face_y               INTEGER,
+                    face_width           INTEGER,
+                    face_height          INTEGER,
+                    age_v1               TEXT,
+                    age_v1_confidence    REAL,
+                    age_v2               TEXT,
+                    age_v2_confidence    REAL,
+                    gender               TEXT,
+                    gender_confidence    REAL,
+                    ethnicity            TEXT,
+                    ethnicity_confidence REAL,
+                    emotion              TEXT,
+                    emotion_confidence   REAL,
+                    model_version        TEXT,
+                    created_at           DATETIME
+                )
+            """)
+
             conn.commit()
 
-    # ----------------------------------------------------
-    # Insert Methods
-    # ----------------------------------------------------
+        finally:
+            conn.close()
 
-    def add_image(self, image_data: dict) -> int:
-        query = """
-            INSERT INTO images (url, public_id, type, face_count, size)
-            VALUES (:url, :public_id, :type, :face_count, :size)
+    # ----------------------------------------------------------
+    # private insert helper — avoids repetition across methods
+    # ----------------------------------------------------------
+
+    def _insert(self, conn, table: str, data: dict) -> int:
         """
-        with self._get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute(query, image_data)
-            conn.commit()
-            return cursor.lastrowid
-
-    def add_processed_image(self, image_data: dict) -> int:
-        query = """
-            INSERT INTO processed_images (url, original_id, public_id, type, face_count, size)
-            VALUES (:url, :original_id, :public_id, :type, :face_count, :size)
+        Builds and executes a parameterised INSERT from a plain dict.
+        Returns the lastrowid (primary key of the new row).
         """
-        with self._get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute(query, image_data)
-            conn.commit()
-            return cursor.lastrowid
+        columns = ", ".join(data.keys())
+        placeholders = ", ".join("?" for _ in data)
+        sql = f"INSERT INTO {table} ({columns}) VALUES ({placeholders})"
+        cursor = conn.cursor()
+        cursor.execute(sql, list(data.values()))
+        return cursor.lastrowid
 
-    def add_face(self, face_data: dict) -> int:
-        if "image_id" not in face_data:
-            raise ValueError("face_data must contain 'image_id'")
+    # ----------------------------------------------------------
+    # requests
+    # ----------------------------------------------------------
 
-        # Ensure all expected keys exist for the query, defaulting to None if missing
-        keys = ["image_id", "public_id", "url", "age_v1", "age_v2", "gender", "ethnicity", "emotion"]
-        data_to_insert = {k: face_data.get(k) for k in keys}
-
-        query = """
-            INSERT INTO faces (image_id, public_id, url, age_v1, age_v2, gender, ethnicity, emotion)
-            VALUES (:image_id, :public_id, :url, :age_v1, :age_v2, :gender, :ethnicity, :emotion)
-        """
-        with self._get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute(query, data_to_insert)
-            conn.commit()
-            return cursor.lastrowid
-
-    def add_video(self, video_data: dict) -> int:
-        query = """
-            INSERT INTO videos (url, size)
-            VALUES (:url, :size)
-        """
-        with self._get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute(query, video_data)
-            conn.commit()
-            return cursor.lastrowid
-
-    # ----------------------------------------------------
-    # Helper Method
-    # ----------------------------------------------------
-
-    def _rows_to_dict_list(self, rows):
-        """Converts SQLite Row objects to standard python dictionaries."""
-        return [dict(row) for row in rows]
-
-    # ----------------------------------------------------
-    # Read Methods
-    # ----------------------------------------------------
-
-    def get_original_images(self):
-        with self._get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM images")
-            return self._rows_to_dict_list(cursor.fetchall())
-
-    def get_processed_images(self):
-        with self._get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM processed_images")
-            return self._rows_to_dict_list(cursor.fetchall())
-
-    def get_videos(self):
-        with self._get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM videos")
-            return self._rows_to_dict_list(cursor.fetchall())
-
-    def get_faces_for_image(self, image_id):
-        # Handle implicit int conversion if string is passed
+    def add_request(self, data: dict) -> int:
+        conn = self._get_connection()
         try:
-            img_id = int(image_id)
-        except (ValueError, TypeError):
-            return []
+            conn.execute("PRAGMA foreign_keys = ON")
+            row_id = self._insert(conn, "requests", data)
+            conn.commit()
+            return row_id
+        finally:
+            conn.close()
 
-        with self._get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM faces WHERE image_id = ?", (img_id,))
-            return self._rows_to_dict_list(cursor.fetchall())
+    # CHANGED: new method to update the request row once processing is done
+    def update_request(self, request_id: str, data: dict) -> None:
+        if not data:
+            return
+        conn = self._get_connection()
+        try:
+            conn.execute("PRAGMA foreign_keys = ON")
+            sets = ", ".join(f"{k} = ?" for k in data)
+            sql = f"UPDATE requests SET {sets} WHERE request_id = ?"
+            conn.execute(sql, [*data.values(), request_id])
+            conn.commit()
+        finally:
+            conn.close()
+            
+    # ----------------------------------------------------------
+    # images
+    # ----------------------------------------------------------
+
+    def add_image(self, data: dict) -> int:
+        conn = self._get_connection()
+        try:
+            conn.execute("PRAGMA foreign_keys = ON")
+            row_id = self._insert(conn, "images", data)
+            conn.commit()
+            return row_id
+        finally:
+            conn.close()
+
+    # ----------------------------------------------------------
+    # faces (image faces)
+    # ----------------------------------------------------------
+
+    def add_face(self, data: dict) -> int:
+        conn = self._get_connection()
+        try:
+            conn.execute("PRAGMA foreign_keys = ON")
+            row_id = self._insert(conn, "faces", data)
+            conn.commit()
+            return row_id
+        finally:
+            conn.close()
+
+    # ----------------------------------------------------------
+    # processed_images
+    # ----------------------------------------------------------
+
+    def add_processed_image(self, data: dict) -> int:
+        conn = self._get_connection()
+        try:
+            conn.execute("PRAGMA foreign_keys = ON")
+            row_id = self._insert(conn, "processed_images", data)
+            conn.commit()
+            return row_id
+        finally:
+            conn.close()
+
+    # ----------------------------------------------------------
+    # videos
+    # ----------------------------------------------------------
+
+    def add_video(self, data: dict) -> int:
+        conn = self._get_connection()
+        try:
+            conn.execute("PRAGMA foreign_keys = ON")
+            row_id = self._insert(conn, "videos", data)
+            conn.commit()
+            return row_id
+        finally:
+            conn.close()
+
+    # ----------------------------------------------------------
+    # video_faces
+    # ----------------------------------------------------------
+
+    def add_video_face(self, data: dict) -> int:
+        conn = self._get_connection()
+        try:
+            conn.execute("PRAGMA foreign_keys = ON")
+            row_id = self._insert(conn, "video_faces", data)
+            conn.commit()
+            return row_id
+        finally:
+            conn.close()

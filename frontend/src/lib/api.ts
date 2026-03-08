@@ -1,10 +1,13 @@
 const IMAGE_UPLOAD_URL = process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL!;
-const SNAPSHOT_UPLOAD_URL = process.env.NEXT_PUBLIC_SNAPSHOT_UPLOAD_URL!;
 const VIDEO_UPLOAD_URL = process.env.NEXT_PUBLIC_VIDEO_UPLOAD_URL!;
 
-async function uploadFile(url: string, file: File) {
+async function uploadFile(url: string, file: File, uploadType?: string) {
   const formData = new FormData();
   formData.append("file", file);
+
+  if (uploadType) {
+    formData.append("upload_type", uploadType);
+  }
 
   const response = await fetch(url, {
     method: "POST",
@@ -20,11 +23,11 @@ async function uploadFile(url: string, file: File) {
 }
 
 export async function uploadImage(file: File) {
-  return uploadFile(IMAGE_UPLOAD_URL, file);
+  return uploadFile(IMAGE_UPLOAD_URL, file, "image_upload");
 }
 
 export async function uploadSnapshot(file: File) {
-  return uploadFile(SNAPSHOT_UPLOAD_URL, file);
+  return uploadFile(IMAGE_UPLOAD_URL, file, "image_snapshot");
 }
 
 export async function uploadVideo(file: File) {

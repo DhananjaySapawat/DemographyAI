@@ -12,10 +12,18 @@ idx_to_age_range = {0: '0-9', 1: '10-19', 2: '20-24', 3: '25-29', 4: '30-34', 5:
 
 def predict_age_range(input_data):
     input_data = input_data.astype(np.float32, copy=False)
+
     age_range_interpreter.set_tensor(input_index, input_data)
     age_range_interpreter.invoke()
-    age_range_logit = age_range_interpreter.get_tensor(output_index)
-    age_label = np.argmax(age_range_logit, axis=1).item()
-    age_range = idx_to_age_range[age_label]        
-    return age_range
 
+    logits = age_range_interpreter.get_tensor(output_index)
+
+    probs = np.exp(logits) / np.sum(np.exp(logits), axis=1, keepdims=True)
+
+    age_label = np.argmax(probs, axis=1).item()
+    confidence = float(np.max(probs))
+
+    return {
+        "label": idx_to_age_range[age_label],
+        "confidence": confidence
+    }

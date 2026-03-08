@@ -1,10 +1,15 @@
+import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.v1 import detect, monitor
+from app.api.v1 import detect, dashboard
 from app.startup import init_startup
 
 app = FastAPI(title="DemographyAI")
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s"
+)
 # Middleware
 app.add_middleware(
     CORSMiddleware,
@@ -18,5 +23,5 @@ init_startup(app)
 
 # Register routers
 app.include_router(detect.router, prefix="", tags=["Detect"])
-app.include_router(monitor.router, prefix="/api", tags=["Monitor"])
+app.include_router(dashboard.router, prefix="/api", tags=["Dashboard"])
 

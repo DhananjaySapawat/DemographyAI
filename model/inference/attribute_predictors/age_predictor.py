@@ -10,8 +10,13 @@ output_index = age_interpreter.get_output_details()[0]["index"]
 
 def predict_age(input_data):
     input_data = input_data.astype(np.float32, copy=False)
+
     age_interpreter.set_tensor(input_index, input_data)
     age_interpreter.invoke()
-    age_logit = age_interpreter.get_tensor(output_index)
-    return str(int(age_logit.item())) 
 
+    age = age_interpreter.get_tensor(output_index).item()
+
+    return {
+        "label": int(age),
+        "confidence": None
+    }

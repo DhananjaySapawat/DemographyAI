@@ -12,9 +12,18 @@ ethnicity_mapping = {0: 'Asian', 1: 'Black', 2: 'Indian', 3: 'Others', 4: 'White
 
 def predict_ethnicity(input_data):
     input_data = input_data.astype(np.float32, copy=False)
+
     ethnicity_interpreter.set_tensor(input_index, input_data)
     ethnicity_interpreter.invoke()
-    ethnicity_logit = ethnicity_interpreter.get_tensor(output_index)
-    ethnicity_id = np.argmax(ethnicity_logit, axis=1).item()
-    ethnicity = ethnicity_mapping[ethnicity_id]  
-    return ethnicity
+
+    logits = ethnicity_interpreter.get_tensor(output_index)
+
+    probs = np.exp(logits) / np.sum(np.exp(logits), axis=1, keepdims=True)
+
+    ethnicity_id = np.argmax(probs, axis=1).item()
+    confidence = float(np.max(probs))
+
+    return {
+        "label": ethnicity_mapping[ethnicity_id],
+        "confidence": confidence
+    }

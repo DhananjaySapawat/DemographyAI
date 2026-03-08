@@ -19,6 +19,6 @@ async def predict_attributes(payload: FaceListPayload):
         for encoded_face in payload.face_array:
             result = await predict_attributes_from_model(encoded_face.image)
             results[encoded_face.face_id] = result
-        return {"predictions": results}
+        return {"predictions": results, "model_version": "1.0"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

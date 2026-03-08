@@ -11,6 +11,7 @@
   "dependencies": {
     "@tensorflow-models/blazeface": "^0.1.0",
     "@tensorflow/tfjs": "^4.22.0",
+    "@tensorflow/tfjs-backend-webgpu": "^4.22.0",
     "lucide-react": "^0.563.0",
     "next": "16.1.4",
     "react": "19.2.3",

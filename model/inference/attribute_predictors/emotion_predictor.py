@@ -12,9 +12,18 @@ emotion_mapping = {0: 'Anger', 1: 'Contempt', 2: 'Disgust', 3: 'Fear', 4: 'Happy
 
 def predict_emotion(input_data):
     input_data = input_data.astype(np.float32, copy=False)
+
     emotion_interpreter.set_tensor(input_index, input_data)
     emotion_interpreter.invoke()
-    emotion_logit = emotion_interpreter.get_tensor(output_index)
-    emotion_id = np.argmax(emotion_logit, axis=1).item()
-    emotion = emotion_mapping[emotion_id] 
-    return emotion
+
+    logits = emotion_interpreter.get_tensor(output_index)
+
+    probs = np.exp(logits) / np.sum(np.exp(logits), axis=1, keepdims=True)
+
+    emotion_id = np.argmax(probs, axis=1).item()
+    confidence = float(np.max(probs))
+
+    return {
+        "label": emotion_mapping[emotion_id],
+        "confidence": confidence
+    }
