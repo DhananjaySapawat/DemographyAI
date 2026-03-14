@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Home, Image as ImageIcon, Camera, Video, Radio } from "lucide-react";
+import { site } from "@/src/config";
 
 import NavLink from "@/src/components/layout/NavLink";
 import styles from "@/src/styles/layout/header.module.css";
@@ -11,8 +12,8 @@ export default function Header() {
         
         <div className={styles.logoWrapper}>
           <Link href="/" className={styles.logoLink}>
-            <span className={styles.logoTextPrimary}>Demography</span>
-            <span className={styles.logoTextAccent}>AI</span>
+            <span className={styles.logoTextPrimary}>{site.initial}</span>
+            <span className={styles.logoTextAccent}>{site.suffix}</span>
           </Link>
         </div>
 

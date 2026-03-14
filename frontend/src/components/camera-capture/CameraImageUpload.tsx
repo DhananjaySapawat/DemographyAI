@@ -41,7 +41,7 @@ export default function ImageUpload() {
     return (
         <>
             <section className={styles.imageUploadSection}>
-                <CameraStream uploadFile={uploadFile} changeFile={changeFile} status={status} upload_error={error} />
+                <CameraStream uploadFile={uploadFile} changeFile={changeFile} status={status} error={error} setError={setError} />
             </section>
             { (status == 'analyzing' || status == 'success') && <AnalysisResult analysisResult={imageResult} /> } 
         </>

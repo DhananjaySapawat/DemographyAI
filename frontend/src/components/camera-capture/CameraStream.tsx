@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { Camera, Circle, RefreshCw } from "lucide-react";
+import { Camera, Circle, RefreshCw, AlertCircle, X } from "lucide-react";
 import styles from "@/src/styles/camera-capture/camera-stream.module.css";
 
-export default function CameraStream({ uploadFile, changeFile,status, upload_error}: any) {
+export default function CameraStream({ uploadFile, changeFile, status, error, setError}: any) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -15,12 +15,26 @@ export default function CameraStream({ uploadFile, changeFile,status, upload_err
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: true,
       });
+
       setStream(mediaStream);
+
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
       }
-    } catch (err) {
+
+      setError(null);
+    } catch (err: any) {
       console.error("Camera error:", err);
+
+      if (err.name === "NotFoundError") {
+        setError("No camera device found");
+      } else if (err.name === "NotAllowedError") {
+        setError("Camera permission denied");
+      } else if (err.name === "NotReadableError") {
+        setError("Camera is already in use by another application");
+      } else {
+        setError("Unable to access camera");
+      }
     }
   };
 
@@ -93,9 +107,22 @@ export default function CameraStream({ uploadFile, changeFile,status, upload_err
         )}
 
         <canvas ref={canvasRef} className={styles.hiddenCanvas} />
+        {error && (
+          <div className={styles.errorBanner}>
+            <AlertCircle size={16} className={styles.errorIcon} />
+
+            <span className={styles.errorText}>{error}</span>
+
+            <button
+              className={styles.errorClose}
+              onClick={() => setError(null)}
+            >
+              <X size={14} />
+            </button>
+          </div>
+        )}
+        
       </div>
-
-
       <div className={styles.controls}>
         {!stream && !capturedFile && (
           <button onClick={startCamera} className={styles.primaryBtn}>
@@ -128,9 +155,8 @@ export default function CameraStream({ uploadFile, changeFile,status, upload_err
             </button>
           </>
         )}
-        
+
       </div>
-      {upload_error && <p className={styles.errorText}>{upload_error}</p>}
 
     </div>
   );

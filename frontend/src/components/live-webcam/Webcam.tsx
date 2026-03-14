@@ -1,6 +1,6 @@
 "use client";
 import { useRef, useState, useEffect, useCallback, use } from "react";
-import { Radio, Play, Square } from "lucide-react";
+import { Radio, Play, Square, AlertCircle, X} from "lucide-react";
 
 import * as blazeface from "@tensorflow-models/blazeface";
 import * as tf from '@tensorflow/tfjs';
@@ -52,9 +52,10 @@ export default function Webcam() {
             }
         });
     }
-function wait(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+    
+    function wait(ms : number) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
     async function runFaceAnalysis() {
         await wait(4000);
@@ -106,17 +107,18 @@ function wait(ms) {
             setMediaStream(stream);
             
         } catch (err: any) {
-            console.error("Error accessing webcam:", err);
+        console.error("Camera error:", err);
 
-            if (err.name === "NotAllowedError") {
-                setError("Camera permission denied. Please allow access.");
-            } else if (err.name === "NotFoundError") {
-                setError("No webcam device found.");
-            } else {
-                setError("Unable to start webcam.");
-            }
+        if (err.name === "NotFoundError") {
+            setError("No camera device found.");
+        } else if (err.name === "NotAllowedError") {
+            setError("Camera permission denied.");
+        } else if (err.name === "NotReadableError") {
+            setError("Camera is already in use by another application.");
+        } else {
+            setError("Unable to access camera.");
         }
-
+        }
     };
 
     const stopWebcam = useCallback(() => {
@@ -188,9 +190,19 @@ function wait(ms) {
                     </div>
                     {error && (
                         <div className={styles.errorBanner}>
-                            {error}
+                            <AlertCircle size={16} className={styles.errorIcon} />
+
+                            <span className={styles.errorText}>{error}</span>
+
+                            <button
+                            className={styles.errorClose}
+                            onClick={() => setError(null)}
+                            >
+                            <X size={14} />
+                            </button>
                         </div>
                     )}
+
                     </>
                 }
 
