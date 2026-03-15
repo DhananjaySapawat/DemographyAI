@@ -1,0 +1,210 @@
+/* ============================================================
+   models.module.css
+   Path: src/styles/footer-pages/how-it-works/models.module.css
+   Covers: modelsGrid · modelCard · modelCardBody · modelCardFooter
+   ============================================================ */
+
+/* ─── Animations ─────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   MODELS GRID  (section 04)
+═══════════════════════════════════════════════════════════ */
+.modelsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 4px 0 8px;
+}
+
+.modelCard {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+  opacity: 0;
+  animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  cursor: default;
+}
+
+.modelCard:nth-child(1) { animation-delay: 0.05s; }
+.modelCard:nth-child(2) { animation-delay: 0.13s; }
+.modelCard:nth-child(3) { animation-delay: 0.21s; }
+.modelCard:nth-child(4) { animation-delay: 0.29s; }
+
+.modelCard:hover {
+  border-color: rgba(37, 99, 235, 0.25);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.05), 0 2px 8px rgba(0, 0, 0, 0.04);
+  transform: translateY(-1px);
+}
+
+
+/* ── Card body ───────────────────────────────────────────── */
+.modelCardBody {
+  padding: 1rem 1.125rem 0.875rem;
+  flex: 1;
+}
+
+.modelCardHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.modelIconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background: var(--bg-theme-light);
+  color: var(--text-accent);
+  border: 1px solid rgba(37, 99, 235, 0.12);
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.modelCard:hover .modelIconWrap {
+  background: var(--bg-accent);
+  color: #fff;
+  border-color: transparent;
+}
+
+.modelTitleRow {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-top: 2px;
+  min-width: 0;
+}
+
+.modelTitle {
+  font-size: 0.875rem;
+  font-weight: 650;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.01em;
+  transition: color 0.2s ease;
+}
+
+.modelCard:hover .modelTitle {
+  color: var(--text-accent);
+}
+
+/* Status badge (stable / monitoring / experimental) */
+.modelStatus {
+  display: inline-block;
+  width: fit-content;
+  font-size: 0.65rem;
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.modelStatus--stable {
+  background: rgba(22, 163, 74, 0.1);
+  color: #15803d;
+  border: 1px solid rgba(22, 163, 74, 0.2);
+}
+
+.modelStatus--monitoring {
+  background: rgba(234, 179, 8, 0.1);
+  color: #a16207;
+  border: 1px solid rgba(234, 179, 8, 0.25);
+}
+
+.modelStatus--experimental {
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--text-accent);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.modelBody {
+  font-size: 0.855rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+
+/* ── Card footer ─────────────────────────────────────────── */
+.modelCardFooter {
+  border-top: 1px solid var(--border-light);
+  padding: 10px 1.125rem;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modelVersion {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* Separator when a card has multiple version blocks */
+.modelVersion + .modelVersion {
+  border-top: 1px solid var(--border-light);
+  padding-top: 8px;
+}
+
+.modelVersionLabel {
+  display: block;
+  font-size: 0.68rem;
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.modelClasses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.modelClassChip {
+  font-size: 0.68rem;
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  color: var(--text-muted);
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .modelsGrid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 768px) {
+  .modelsGrid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .modelCardBody    { padding: 0.875rem 1rem 0.75rem; }
+  .modelCardFooter  { padding: 8px 1rem; }
+}
+
+/* ── Reduced motion ──────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .modelCard { animation: none; opacity: 1; }
+  .modelCard:hover { transform: none; }
+}

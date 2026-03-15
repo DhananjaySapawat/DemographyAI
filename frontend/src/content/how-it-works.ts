@@ -2,17 +2,19 @@ import {
   Upload,
   Server,
   Cpu,
-  BarChart2,
-  Wifi,
+  ChartBar,
+  Radio,
   WifiOff,
   ScanFace,
-  Brain,
   Layers,
-  Smile,
-  Users,
-  Calendar,
+  SmilePlus,
+  UsersRound,
+  CalendarDays,
   ShieldCheck,
-  AlertTriangle,
+  TriangleAlert,
+  Zap,
+  Landmark,
+  FlaskConical,
   type LucideIcon,
 } from "lucide-react";
 
@@ -32,14 +34,21 @@ export interface PipelineStep {
   body: string;
 }
 
-export interface Model {
+type OutputVariant =
+  | { kind: "labeled"; label: string; value: string }
+  | { kind: "value"; value: string };
+
+interface ModelVersion {
+  label: string;
+  outputs: OutputVariant[];
+}
+
+interface Model {
   id: string;
   icon: LucideIcon;
   title: string;
-  output: string;
-  confidence: boolean;
-  body: string;
-  architecture: string;
+  description: string;
+  versions: ModelVersion[];
 }
 
 export interface TrainingBlock {
@@ -61,17 +70,17 @@ export const hero = {
   title: "Under the hood,",
   accent: "nothing is magic",
   description:
-    "Two separate inference pipelines, five TFLite models, and one honest disclaimer about accuracy. Here's exactly what happens when you upload a photo.",
+    "Two separate inference pipelines, four TFLite models, and one honest disclaimer about accuracy. Here's exactly what happens when you upload a photo.",
 };
 
 export const modes: Mode[] = [
   {
     id: "server",
-    icon: Wifi,
+    icon: Server,
     label: "Server-side",
     tag: "Default",
     description:
-      "Photo or video is sent to the FastAPI backend. Inference runs on the server using TFLite. More accurate, works on any device.",
+      "Photo or video is sent to the FastAPI backend. Inference runs on the server using TFLite. More accurate, works on any device, and returns results faster than browser-side processing.",
   },
   {
     id: "private",
@@ -103,12 +112,12 @@ export const serverSteps: PipelineStep[] = [
     num: "03",
     icon: Cpu,
     title: "Model inference",
-    body: "Each cropped face is passed through all five TFLite models in parallel. Each model returns a label and a confidence score.",
+    body: "Each cropped face is passed through all four TFLite models in parallel. Each model returns a label and a confidence score for its prediction.",
   },
   {
     id: "results",
     num: "04",
-    icon: BarChart2,
+    icon: ChartBar,
     title: "Results",
     body: "Predictions are bundled per face and returned to the frontend as JSON. The UI renders them overlaid on the original image.",
   },
@@ -118,7 +127,7 @@ export const browserSteps: PipelineStep[] = [
   {
     id: "stream",
     num: "01",
-    icon: Server,
+    icon: Radio,
     title: "Webcam stream",
     body: "The webcam feed is captured directly in the browser using the MediaDevices API. No frames are sent anywhere.",
   },
@@ -132,14 +141,14 @@ export const browserSteps: PipelineStep[] = [
   {
     id: "tfjs",
     num: "03",
-    icon: Cpu,
+    icon: Zap,
     title: "TensorFlow.js inference",
-    body: "Cropped face regions are passed through the TensorFlow.js versions of the models. Everything runs on your device's GPU or CPU via WebGL.",
+    body: "Cropped face regions are passed through all four TFLite models via TensorFlow.js. Everything runs on your device's GPU or CPU via WebGL.",
   },
   {
     id: "overlay",
     num: "04",
-    icon: BarChart2,
+    icon: ChartBar,
     title: "Live overlay",
     body: "Predictions are drawn directly onto a canvas element over the video feed. Results update in real time as your face moves.",
   },
@@ -148,57 +157,80 @@ export const browserSteps: PipelineStep[] = [
 export const models: Model[] = [
   {
     id: "age",
-    icon: Calendar,
-    title: "Age estimation",
-    output: "Single integer (e.g. 27)",
-    confidence: false,
-    body: "Regression model that outputs a single age value directly. No softmax, no classes — just a number.",
-    architecture: "MobileNet backbone, regression head",
-  },
-  {
-    id: "age-range",
-    icon: Layers,
-    title: "Age range",
-    output: "9 buckets: 0-9 … 55+",
-    confidence: true,
-    body: "Classification model with 9 age buckets. Uses softmax over logits to produce a probability distribution.",
-    architecture: "MobileNet backbone, classification head",
+    icon: CalendarDays,
+    title: "Age Estimation",
+    description:
+      "Two parallel models are running simultaneously — one using regression for a single continuous value, the other using classification for age ranges. Both are being monitored to determine which approach is more reliable.",
+    versions: [
+      {
+        label: "Regression (v1)",
+        outputs: [{ kind: "value", value: "e.g. 27" }],
+      },
+      {
+        label: "Classification (v2)",
+        outputs: [
+          "0-9", "10-19", "20-24", "25-29",
+          "30-34", "35-39", "40-44", "45-54", "55+",
+        ].map((v) => ({ kind: "value" as const, value: v })),
+      },
+    ],
   },
   {
     id: "emotion",
-    icon: Smile,
-    title: "Emotion detection",
-    output: "8 classes incl. Happy, Neutral, Surprise",
-    confidence: true,
-    body: "8-class classifier trained on emotion-labelled face datasets. Softmax over logits gives a probability per class.",
-    architecture: "MobileNet backbone, 8-class softmax",
+    icon: SmilePlus,
+    title: "Emotion Analysis",
+    description:
+      "Analyzes facial expression patterns to output the most likely emotional state from a set of universal categories.",
+    versions: [
+      {
+        label: "Default",
+        outputs: [
+          "Happy", "Sad", "Angry", "Fear",
+          "Disgust", "Surprise", "Neutral", "Contempt",
+        ].map((v) => ({ kind: "value" as const, value: v })),
+      },
+    ],
   },
   {
     id: "ethnicity",
-    icon: Users,
-    title: "Ethnicity classification",
-    output: "Asian, Black, Indian, Others, White",
-    confidence: true,
-    body: "5-class classifier. A coarse grouping based on visual features in the training data — not a definitive classification.",
-    architecture: "MobileNet backbone, 5-class softmax",
+    icon: Landmark,
+    title: "Ethnicity Analysis",
+    description:
+      "Analyzes facial features to output coarse ethnicity groups derived from training data distributions.",
+    versions: [
+      {
+        label: "Default",
+        outputs: ["Asian", "Black", "Indian", "White", "Other"].map((v) => ({
+          kind: "value" as const,
+          value: v,
+        })),
+      },
+    ],
   },
   {
     id: "gender",
-    icon: Brain,
-    title: "Gender prediction",
-    output: "Female, Male",
-    confidence: true,
-    body: "Binary classifier using sigmoid activation. Confidence is the distance from 0.5.",
-    architecture: "MobileNet backbone, sigmoid output",
+    icon: UsersRound,
+    title: "Gender Analysis",
+    description:
+      "Analyzes facial structure patterns to output binary gender categories based on model training.",
+    versions: [
+      {
+        label: "Default",
+        outputs: [
+          { kind: "value", value: "Female" },
+          { kind: "value", value: "Male" },
+        ],
+      },
+    ],
   },
 ];
 
 export const trainingBlocks: TrainingBlock[] = [
   {
     id: "pytorch",
-    icon: Brain,
+    icon: FlaskConical,
     title: "Trained in PyTorch",
-    body: "All five models were trained in PyTorch using MobileNet as the backbone. MobileNet was chosen because it is fast, lightweight, and well-suited for face attribute tasks.",
+    body: "All four models were trained in PyTorch using MobileNet as the backbone. MobileNet was chosen because it is fast, lightweight, and well-suited for face attribute tasks.",
   },
   {
     id: "export",
@@ -211,19 +243,19 @@ export const trainingBlocks: TrainingBlock[] = [
 export const limitations: Limitation[] = [
   {
     id: "lighting",
-    icon: AlertTriangle,
+    icon: TriangleAlert,
     title: "Poor lighting or blur",
     body: "YuNet and BlazeFace both struggle with very dark, overexposed, or heavily blurred images.",
   },
   {
     id: "profile",
-    icon: AlertTriangle,
+    icon: TriangleAlert,
     title: "Side profiles and extreme angles",
     body: "The models were trained mostly on frontal faces. Side profiles will reduce accuracy significantly.",
   },
   {
     id: "accuracy",
-    icon: AlertTriangle,
+    icon: TriangleAlert,
     title: "Age and emotion accuracy",
     body: "Age estimation can be off by several years. Emotion detection is regularly confused by neutral and contempt.",
   },
@@ -235,9 +267,15 @@ export const limitations: Limitation[] = [
   },
   {
     id: "browser",
-    icon: AlertTriangle,
+    icon: TriangleAlert,
     title: "Browser mode is less accurate",
     body: "TensorFlow.js inference is constrained by the browser environment. Performance depends heavily on the device.",
+  },
+  {
+    id: "occlusion",
+    icon: TriangleAlert,
+    title: "Occlusions like masks or glasses",
+    body: "Face coverings, sunglasses, hands, or objects blocking parts of the face can significantly reduce detection and attribute accuracy.",
   },
 ];
 

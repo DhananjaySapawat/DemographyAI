@@ -1,0 +1,282 @@
+/* ============================================================
+   layout.module.css
+   Path: src/styles/footer-pages/how-it-works/layout.module.css
+   Covers: page · hero · content wrapper · sectionHeader · divider
+   ============================================================ */
+
+/* ─── Animations ─────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   PAGE
+═══════════════════════════════════════════════════════════ */
+.page {
+  background-color: var(--bg-primary);
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════════════════════ */
+.pageHero {
+  position: relative;
+  padding: 5rem 1.5rem 4rem;
+  text-align: center;
+  background: var(--bg-primary);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Soft radial spotlight */
+.pageHero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% -10%, rgba(37, 99, 235, 0.09) 0%, transparent 65%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Subtle bottom fade */
+.pageHero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--border-light) 30%, var(--border-light) 70%, transparent 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Grid overlay */
+.heroGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border-light) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-light) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 75%);
+  opacity: 0.45;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.heroInner {
+  position: relative;
+  z-index: 2;
+  max-width: 52rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  animation: fadeUp 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Large watermark */
+.heroWatermark {
+  position: absolute;
+  right: -2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.035;
+  animation: fadeIn 1.2s ease forwards;
+}
+
+.heroWatermark svg {
+  width: 280px;
+  height: 280px;
+  color: var(--color-brand-accent);
+}
+
+/* Badge */
+.heroBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 9999px;
+  background: var(--badge-accent-primary-bg);
+  color: var(--text-accent);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.heroTitle {
+  font-size: clamp(2.5rem, 5.5vw, 3.5rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+  margin: 0;
+}
+
+.heroTitleAccent {
+  background: linear-gradient(
+    90deg,
+    var(--text-accent) 0%,
+    var(--text-accent) 40%,
+    #ffffff 50%,
+    var(--text-accent) 60%,
+    var(--text-accent) 100%
+  );
+  background-size: 200% auto;
+  color: var(--text-accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 5s linear infinite;
+}
+
+.heroDescription {
+  max-width: 38rem;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.heroMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 0.25rem;
+  padding: 5px 14px;
+  border-radius: 9999px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  font-size: 0.775rem;
+  color: var(--text-muted);
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+}
+
+.heroMetaLabel {
+  color: var(--text-accent);
+  font-weight: 600;
+}
+
+.heroMetaSep {
+  color: var(--border-default);
+}
+
+.heroMetaDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--bg-accent);
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   CONTENT WRAPPER
+═══════════════════════════════════════════════════════════ */
+.content {
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 6rem;
+  animation: fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+}
+
+/* ── Section header ──────────────────────────────────────── */
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1.125rem;
+}
+
+.sectionNum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-accent);
+  background: var(--badge-accent-primary-bg);
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  padding: 3px 9px;
+  border-radius: 6px;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+.sectionTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.018em;
+  margin: 0;
+}
+
+.sectionIntro {
+  font-size: 0.855rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+  margin: 0 0 1.25rem;
+}
+
+/* ── Divider ─────────────────────────────────────────────── */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-light) 20%, var(--border-light) 80%, transparent);
+  margin: 2rem 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════════ */
+@media (max-width: 860px) {
+  .content { padding-top: 2.5rem; }
+}
+
+@media (max-width: 768px) {
+  .heroTitle    { font-size: 2rem; }
+  .sectionTitle { font-size: 1.1rem; }
+  .content      { padding: 2rem 1.25rem 4rem; }
+  .divider      { margin: 1.5rem 0; }
+}
+
+@media (max-width: 600px) {
+  .pageHero { padding: 3.5rem 1.25rem 3rem; }
+  .heroTitle { font-size: 2.15rem; letter-spacing: -0.03em; }
+  .heroWatermark { display: none; }
+}
+
+@media (max-width: 480px) {
+  .heroTitle { font-size: 1.75rem; }
+}
+
+/* ── Reduced motion ──────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .heroInner,
+  .heroWatermark,
+  .content { animation: none; opacity: 1; }
+  .heroTitleAccent { animation: none; }
+}

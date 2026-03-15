@@ -1,0 +1,282 @@
+/* ============================================================
+   modes-pipeline.module.css  — modes · pipeline
+   ============================================================ */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MODES  (section 01)
+═══════════════════════════════════════════════════════════ */
+.modesGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.modeCard {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+  padding: 1rem 1.125rem;
+  opacity: 0;
+  animation: fadeUp 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.modeCard:nth-child(1) { animation-delay: 0.2s; }
+.modeCard:nth-child(2) { animation-delay: 0.3s; }
+
+.modeCard:hover {
+  border-color: rgba(37, 99, 235, 0.25);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.05), 0 2px 8px rgba(0, 0, 0, 0.04);
+  transform: translateY(-1px);
+}
+
+.modeCardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.625rem;
+}
+
+.modeCardIconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background: var(--bg-theme-light);
+  color: var(--text-accent);
+  border: 1px solid rgba(37, 99, 235, 0.12);
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.modeCard:hover .modeCardIconWrap {
+  background: var(--bg-accent);
+  color: #fff;
+  border-color: transparent;
+}
+
+.modeTag {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 9999px;
+  background: var(--badge-accent-primary-bg);
+  color: var(--text-accent);
+  border: 1px solid rgba(37, 99, 235, 0.18);
+}
+
+.modeTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.375rem;
+}
+
+.modeBody {
+  font-size: 0.855rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   PIPELINE GRID  (section 02)
+   Two columns: server (left) · browser (right)
+═══════════════════════════════════════════════════════════ */
+.pipelineGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  align-items: stretch;
+}
+
+/* Each column is a card wrapping its pipeline */
+.pipelineCol {
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+  padding: 1rem 1.125rem 1.25rem;
+  opacity: 0;
+  animation: fadeUp 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  display: flex;
+  flex-direction: column;
+}
+
+.pipelineCol:nth-child(1) { animation-delay: 0.2s; }
+.pipelineCol:nth-child(2) { animation-delay: 0.3s; }
+
+/* Column header — icon + label + tag, mirrors modeCardTop */
+.pipelineColTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.625rem;
+}
+
+.pipelineColIconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background: var(--bg-theme-light);
+  color: var(--text-accent);
+  border: 1px solid rgba(37, 99, 235, 0.12);
+}
+
+.pipelineColTag {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 9999px;
+  background: var(--badge-accent-primary-bg);
+  color: var(--text-accent);
+  border: 1px solid rgba(37, 99, 235, 0.18);
+}
+
+.pipelineColTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.375rem;
+}
+
+.pipelineColIntro {
+  font-size: 0.855rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0 0 1rem;
+}
+
+/* Divider between intro and steps */
+.pipelineColDivider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-light) 20%, var(--border-light) 80%, transparent);
+  margin: 0 0 1rem;
+}
+
+
+/* ── Pipeline steps (shared by both columns) ─────────────── */
+.pipeline { position: relative; }
+
+.pipelineLine {
+  position: absolute;
+  left: 1.25rem;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, var(--border-light) 10%, var(--border-light) 90%, transparent);
+}
+
+.pipelineSteps {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.pipelineStep {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  padding-left: 3.5rem;
+  opacity: 0;
+  animation: fadeUp 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.pipelineStep:nth-child(1) { animation-delay: 0.1s; }
+.pipelineStep:nth-child(2) { animation-delay: 0.2s; }
+.pipelineStep:nth-child(3) { animation-delay: 0.3s; }
+.pipelineStep:nth-child(4) { animation-delay: 0.4s; }
+.pipelineStep:nth-child(5) { animation-delay: 0.5s; }
+
+.pipelineNum {
+  position: absolute;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  z-index: 1;
+  transition: all 0.2s ease;
+}
+
+/* Inside a pipelineCol the num bg should match the card bg */
+.pipelineCol .pipelineNum {
+  background: var(--bg-secondary);
+}
+
+.pipelineStep:hover .pipelineNum {
+  border-color: rgba(37, 99, 235, 0.25);
+  background: var(--badge-accent-primary-bg);
+  color: var(--text-accent);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.05);
+}
+
+.pipelineStepBody {
+  flex: 1;
+  padding-bottom: 0.25rem;
+}
+
+.pipelineStepTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 650;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+  letter-spacing: -0.01em;
+}
+
+.pipelineStepIcon {
+  color: var(--text-muted);
+  transition: color 0.2s ease;
+}
+
+.pipelineStep:hover .pipelineStepIcon { color: var(--text-accent); }
+
+.pipelineStepText {
+  font-size: 0.855rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .modesGrid    { grid-template-columns: 1fr; }
+  .pipelineGrid { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modeCard,
+  .pipelineCol,
+  .pipelineStep { animation: none; opacity: 1; }
+  .modeCard:hover { transform: none; }
+}
