@@ -22,7 +22,7 @@ async function setupWebGPU() {
 setupWebGPU();
 function logBackendDuringInference(stage: string) {
   const backend = tf.getBackend();
-  const backendInstance = tf.engine().backendInstance?.constructor?.name;
+  const backendInstance = (tf.engine() as any).backendInstance?.constructor?.name;
 
   console.log(`🔍 [${stage}] TFJS Backend:`, backend);
   console.log(`🔍 [${stage}] Backend Class:`, backendInstance);
@@ -84,15 +84,16 @@ function find_value_by_logit(logit : any, my_feature : any){
         let gender_id = (1 / (1 + Math.exp(-logit[0])) > 0.5) ? 1 : 0;
         return gender_mapping[gender_id]; 
     }
+    
+    const values : any = Object.values(logit);
+    const maxIndex = values.indexOf(Math.max(...values));
 
-    else if (my_feature == "ethnicity") {
-        const ethnicity_id = Object.values(logit).indexOf(Math.max(...Object.values(logit)));  
-        return ethnicity_mapping[ethnicity_id]; 
+    if (my_feature === "ethnicity") {
+      return ethnicity_mapping[maxIndex];
     }
 
-    else if (my_feature == "emotion"){
-        const emotion_id = Object.values(logit).indexOf(Math.max(...Object.values(logit)));  
-        return emotion_mapping[emotion_id]; 
+    else if (my_feature === "emotion") {
+      return emotion_mapping[maxIndex];
     }
     
     else{

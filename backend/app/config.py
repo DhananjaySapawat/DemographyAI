@@ -4,6 +4,9 @@ from dotenv import load_dotenv
 # Load environment variables from .env
 load_dotenv()
 
+MODE = os.getenv("MODE")
+
+FRONT_END_URL = os.getenv("FRONT_END_URL")
 BASE_URL = os.getenv("BASE_URL")
 MODEL_URL = os.getenv("MODEL_URL")
 
@@ -15,3 +18,5 @@ ALLOWED_IMAGE_TYPES = { "image/jpeg", "image/jpg", "image/png", "image/webp"}
 
 MAX_VIDEO_SIZE = 30
 ALLOWED_VIDEO_TYPES = {"video/mp4", "video/webm", "video/quicktime"}
+
+WEBSITE_NAME = "DemographyAI"

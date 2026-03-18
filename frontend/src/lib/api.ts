@@ -1,5 +1,4 @@
-const IMAGE_UPLOAD_URL = process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL!;
-const VIDEO_UPLOAD_URL = process.env.NEXT_PUBLIC_VIDEO_UPLOAD_URL!;
+const BACKEND_URL= process.env.NEXT_PUBLIC_BACKEND_URL!;
 
 async function uploadFile(url: string, file: File, uploadType?: string) {
   const formData = new FormData();
@@ -23,13 +22,13 @@ async function uploadFile(url: string, file: File, uploadType?: string) {
 }
 
 export async function uploadImage(file: File) {
-  return uploadFile(IMAGE_UPLOAD_URL, file, "image_upload");
+  return uploadFile(`${BACKEND_URL}/detect/image`, file, "image_upload");
 }
 
 export async function uploadSnapshot(file: File) {
-  return uploadFile(IMAGE_UPLOAD_URL, file, "image_snapshot");
+  return uploadFile(`${BACKEND_URL}/detect/image`, file, "image_snapshot");
 }
 
 export async function uploadVideo(file: File) {
-  return uploadFile(VIDEO_UPLOAD_URL, file);
+  return uploadFile(`${BACKEND_URL}/detect/video`, file);
 }

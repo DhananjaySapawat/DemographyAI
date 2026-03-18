@@ -1,7 +1,7 @@
-export const drawMesh = (ctx, scaleX, scaleY, predictions) => {
+export const drawMesh = (ctx : any, scaleX : number, scaleY  : number, predictions : any) => {
   if (!predictions || predictions.length === 0) return;
 
-  predictions.forEach((prediction) => {
+  predictions.forEach((prediction : any) => {
     const start = prediction.topLeft;
     const end = prediction.bottomRight;
     
@@ -18,7 +18,7 @@ export const drawMesh = (ctx, scaleX, scaleY, predictions) => {
   });
 };
 
-export function getStreamFaces (faceCtx, faceCanvas, video, videoWidth, videoHeight, predictions) {
+export function getStreamFaces (faceCtx : any, faceCanvas : any, video : any, videoWidth : any, videoHeight : any, predictions : any) {
     var streamFaces = [];
     
     for (const pred of predictions) {

@@ -1,44 +1,112 @@
 #!/bin/bash
 
-MODE="dev"   # default
+MODE="dev"
+DB="sqlite"
+
+# -----------------------------
+# Parse arguments
+# -----------------------------
 
 while [[ "$#" -gt 0 ]]; do
   case "$1" in
-    --prod)
-      MODE="prod"
+    --mode)
+      MODE="$2"
+      shift
       ;;
-    --dev)
-      MODE="dev"
+    --db)
+      DB="$2"
+      shift
       ;;
     *)
-      echo "Unknown flag: $1"
+      echo "Unknown argument: $1"
       exit 1
       ;;
   esac
   shift
 done
 
-echo "Mode selected: $MODE"
+echo "Mode: $MODE"
 
-if [ "$MODE" = "prod" ]; then
-  echo "🚀 Running in PRODUCTION mode"
+# -----------------------------
+# Providers
+# -----------------------------
+
+if [[ "$MODE" == "prod" || "$MODE" == "prod-docker" ]]; then
+  export STORAGE_PROVIDER="cloudinary"
+  export DB_PROVIDER="firebase"
+else
+  export STORAGE_PROVIDER="local"
+  export DB_PROVIDER="$DB"
+fi
+
+export APP_MODE=$MODE
+
+echo "Storage Provider: $STORAGE_PROVIDER"
+echo "DB Provider: $DB_PROVIDER"
+
+# -----------------------------
+# Mode logic
+# -----------------------------
+
+if [ "$MODE" = "prod-docker" ]; then
+
+  echo "🐳 Production Docker mode"
   docker compose up --build
 
+elif [ "$MODE" = "prod" ]; then
+
+  echo "🚀 Production mode"
+
+  bash -c "cd model && ./run.sh" &
+  PID_MODEL=$!
+
+  bash -c "cd backend && ./run.sh" &
+  PID_BACKEND=$!
+
+  bash -c "cd frontend && ./run.sh" &
+  PID_FRONTEND=$!
+
+  wait $PID_MODEL $PID_BACKEND $PID_FRONTEND
+
+
+elif [ "$MODE" = "local-docker" ]; then
+
+  echo "🐳 Local Docker mode"
+  docker compose up --build
+
+
+elif [ "$MODE" = "local" ]; then
+
+  echo "🛠 Local services mode"
+
+  bash -c "cd model && ./run.sh" &
+  PID_MODEL=$!
+
+  bash -c "cd backend && ./run.sh" &
+  PID_BACKEND=$!
+
+  bash -c "cd frontend && ./run.sh" &
+  PID_FRONTEND=$!
+
+  wait $PID_MODEL $PID_BACKEND $PID_FRONTEND
+
+
 elif [ "$MODE" = "dev" ]; then
-  echo "🛠️ Running in LOCAL mode"
 
-    bash -c "cd backend && ./run.sh" &
-    PID1=$!
+  echo "⚡ Dev mode"
 
-    bash -c "cd model && ./run.sh" &
-    PID2=$!
+  bash -c "cd model && ./run.sh" &
+  PID_MODEL=$!
 
-    bash -c "cd frontend && npm run dev" &
-    PID3=$!
+  bash -c "cd backend && ./run.sh" &
+  PID_BACKEND=$!
 
-    bash -c "cd dummy_frontend && npm run dev" &
-    PID4=$!
+  bash -c "cd frontend && ./run.sh" &
+  PID_FRONTEND=$!
 
-    wait $PID1 $PID2 $PID3 $PID4
+  wait $PID_MODEL $PID_BACKEND $PID_FRONTEND
 
+else
+  echo "Unknown mode: $MODE"
+  exit 1
 fi
