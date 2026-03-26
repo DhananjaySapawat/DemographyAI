@@ -6,7 +6,7 @@ load_dotenv()
 
 MODE = os.getenv("MODE")
 
-FRONT_END_URL = os.getenv("FRONT_END_URL")
+FRONT_END_URL = os.getenv("FRONTEND_URL")
 BASE_URL = os.getenv("BASE_URL")
 MODEL_URL = os.getenv("MODEL_URL")
 

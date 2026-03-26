@@ -3,12 +3,7 @@
 import { useEffect, useState } from "react";
 import { Sun, Moon } from "lucide-react";
 
-interface ThemeToggleProps {
-  className?: string;
-  iconWrapper?: string;
-}
-
-export default function ThemeToggle({ className, iconWrapper }: ThemeToggleProps) {
+export default function ThemeToggle() {
   const [isDarkMode, setIsDarkMode] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -37,11 +32,11 @@ export default function ThemeToggle({ className, iconWrapper }: ThemeToggleProps
   return (
     <button
       onClick={toggleTheme}
-      className={className}
       aria-label="Toggle theme"
       data-mode={isDarkMode ? "dark" : "light"}
+      className="flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-200 text-white/60 hover:text-white hover:bg-white/10 active:scale-95"
     >
-      <div className={iconWrapper}>
+      <div className="flex items-center justify-center">
         {isDarkMode ? <Moon size={16} /> : <Sun size={16} />}
       </div>
     </button>

@@ -6,7 +6,7 @@ return (
     <div className={styles.cardGroup}>
       <div className={styles.imageWrapper}>
         <img 
-          src={faceDetails.image_url}
+          src={faceDetails.image_url.replace("http://localhost:8000", process.env.NEXT_PUBLIC_BACKEND_URL)}
           alt={`Face #${faceDetails?.face_idx}`}
           className={styles.image}
           width={100}

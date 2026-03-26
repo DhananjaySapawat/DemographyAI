@@ -90,14 +90,14 @@ function FileUploader({styles, error, fileInputRef, handleDrop, isVideo, maxSize
         >
 
         <div className={styles.iconWrapper}>
-          {isVideo ? <Video size={40} /> : <Upload size={40} />}
+          {isVideo ? <Video /> : <Upload />}
         </div>
 
         <h3 className={styles.title}>Drag & drop your {isVideo ? "video" : "image"} here</h3>
         <p className={styles.subtitle}>or click to browse files</p>
 
         <button className={styles.button}>
-          <Upload size={18} />
+          <Upload />
           Select {isVideo ? "Video" : "Image"} 
         </button>
 
@@ -117,12 +117,12 @@ function AnalyzeContainer({styles, removeFile, file, status, uploadFile, upload_
         className={`${styles.removeButton} ${status === "analyzing" ? "pointer-events-none" : ""}`} 
         onClick={() => status != "analyzing" && removeFile()}
       >
-        <X size={18} />
+        <X />
       </button>
 
       <div className={styles.successContent}>
         <div className={styles.successIconContainer}>
-          <CircleCheckBig size={40} />
+          <CircleCheckBig />
         </div>
 
         <p className={styles.fileName}>{file?.name}</p>
@@ -147,7 +147,7 @@ function SuccessContainer({ styles, fileInputRef, isVideo }: any) {
     <div className={styles.successContainer}>
       <div className={styles.successContent}>
         <div className={styles.successIconContainer}>
-          <Sparkles size={40} />
+          <Sparkles />
         </div>
 
         <p className={styles.fileName}>Analysis Complete</p>
@@ -156,7 +156,7 @@ function SuccessContainer({ styles, fileInputRef, isVideo }: any) {
         </span>
 
         <button className={styles.analyzeButton} onClick={() => {fileInputRef.current?.click();}}>
-           <RefreshCw size={18} /> Analyze Another {isVideo ? "Video" : "Image"} 
+           <RefreshCw /> Analyze Another {isVideo ? "Video" : "Image"} 
         </button>
       </div>
     </div>

@@ -3,22 +3,15 @@
   background: var(--bg-theme);
 }
 
-@media (max-width: 768px) {
-  .header {
-    display: none;
-  }
-}
-
 .headerContainer {
-  max-width: 1280px;
-  height: 5rem;
-  margin: 0 auto;
-  padding: 0 1.5rem;
+  height: 4rem;
+  padding: 0 1.25rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
+/* ── Logo ── */
 .logoWrapper {
   display: flex;
   align-items: center;
@@ -48,29 +41,58 @@
   margin-left: 2px;
 }
 
-.nav {
+/* ── Right controls (theme toggle + hamburger) ── */
+.rightControls {
   display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ── Hamburger ── */
+.menuButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-on-dark-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem;
+  border-radius: 0.5rem;
+  transition: background 0.2s ease;
+}
+
+.menuButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ── Drawer ── */
+.drawer {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.75rem 1rem 1.25rem;
 }
 
 .navList {
   list-style: none;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
   margin: 0;
   padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 .navItem {
   display: flex;
 }
 
+/* ── Nav links ── */
 .navLink {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1rem;
-  font-size: 0.875rem;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.65rem 1rem;
+  font-size: 0.9rem;
   font-weight: 500;
   border-radius: 0.5rem;
   color: var(--text-on-dark-secondary);
@@ -91,20 +113,4 @@
 .activeNavLink:hover {
   background: var(--bg-accent);
   color: var(--text-on-dark-primary);
-}
-
-.rightControls {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.mobileOnly {
-  display: none;
-}
-
-@media (max-width: 768px) {
-  .mobileOnly {
-    display: block;
-  }
 }

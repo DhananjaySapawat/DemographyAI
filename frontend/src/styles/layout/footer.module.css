@@ -114,3 +114,55 @@
     order: 3; /* Move icons to the bottom of the stack */
   }
 }
+
+@media (max-width: 768px) {
+  .topRow {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .brandBlock {
+    text-align: center;
+  }
+
+  .links {
+    order: 2;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .socials {
+    order: 3;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 1.5rem 1rem;
+  }
+
+  .links {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .logo {
+    font-size: 1.1rem;
+  }
+
+  .tagline {
+    font-size: 0.8rem;
+  }
+
+  .link {
+    font-size: 0.8rem;
+  }
+
+  .copyright {
+    font-size: 0.7rem;
+  }
+}

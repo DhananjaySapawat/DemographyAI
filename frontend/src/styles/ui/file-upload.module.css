@@ -1,3 +1,44 @@
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+/* ── Base dropzone ────────────────────────────────────────── */
+
 .dropzone {
   animation: fadeInUp 0.6s ease both;
   width: 42rem;
@@ -40,6 +81,8 @@
   transform: translateY(-2px);
 }
 
+/* ── Icon wrapper inside dropzone ─────────────────────────── */
+
 .iconWrapper {
   margin: 0 auto 1.5rem auto;
   width: 5rem;
@@ -79,6 +122,8 @@
   opacity: 1;
 }
 
+/* ── Dropzone text ────────────────────────────────────────── */
+
 .title {
   margin-bottom: 0.5rem;
   font-size: 1.25rem;
@@ -101,6 +146,8 @@
 .dropzone:hover .subtitle {
   color: var(--text-secondary);
 }
+
+/* ── Upload button ────────────────────────────────────────── */
 
 .button {
   display: inline-flex;
@@ -154,6 +201,8 @@
     inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* ── Helper & error text ──────────────────────────────────── */
+
 .helperText {
   margin-top: 1rem;
   font-size: 0.75rem;
@@ -174,39 +223,13 @@
   text-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
 }
 
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-4px); }
-  40% { transform: translateX(4px); }
-  60% { transform: translateX(-2px); }
-  80% { transform: translateX(2px); }
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
 .dropzoneError {
   animation: shake 0.35s ease;
   border-color: #ef4444;
   background: rgba(239, 68, 68, 0.05);
 }
+
+/* ── Success container ────────────────────────────────────── */
 
 .successContainer {
   animation: fadeInUp 0.6s ease both;
@@ -235,15 +258,6 @@
   animation: rotate 20s linear infinite;
   opacity: 0;
   transition: opacity 0.3s ease;
-}
-
-@keyframes rotate {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
 }
 
 .successContainer:hover::before {
@@ -337,15 +351,6 @@
   transition: opacity 0.3s ease;
 }
 
-@keyframes gradientShift {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
-
 .successContainer:hover .successIconContainer::after {
   opacity: 0.3;
   filter: blur(8px);
@@ -356,7 +361,6 @@
   box-shadow: 0 10px 30px -5px rgba(99, 102, 241, 0.4);
   color: var(--text-on-dark-primary);
   background: var(--bg-accent);
-
 }
 
 .fileName {
@@ -440,6 +444,8 @@
     0 4px 12px -2px rgba(99, 102, 241, 0.3),
     inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+/* ── Result container ─────────────────────────────────────── */
 
 .resultContainer {
   animation: fadeInUp 0.6s ease both;
@@ -546,4 +552,197 @@
   box-shadow: 
     0 15px 35px -10px rgba(99, 102, 241, 0.5),
     0 0 20px rgba(168, 85, 247, 0.3);
+}
+
+.iconWrapper svg,
+.successIconContainer svg,
+.resultIconWrapper svg {
+  width: 40px;
+  height: 40px;
+}
+
+.button svg,
+.analyzeButton svg,
+.removeButton svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ------------------------------------------------------------
+   1024px — Tablet landscape
+   - The fixed width (42rem) would overflow on smaller viewports,
+     so switch to percentage-based width
+   - Reduce fixed height so content isn't clipped on smaller screens
+   ------------------------------------------------------------ */
+@media (max-width: 1024px) {
+
+  .dropzone,
+  .successContainer,
+  .resultContainer {
+    width: 100%;
+    max-width: 42rem;
+    height: auto;    
+    min-height: 20rem;
+  }
+
+  .dropzone,
+  .successContainer,
+  .resultContainer {
+    padding: 2.5rem;
+  }
+}
+
+
+/* ------------------------------------------------------------
+   768px — Tablet portrait
+   - Remove max-width so containers fill the available column
+   - Compact padding and icon sizes
+   ------------------------------------------------------------ */
+@media (max-width: 768px) {
+
+  .dropzone,
+  .successContainer,
+  .resultContainer {
+    max-width: 100%;
+    min-height: 18rem;
+    padding: 2rem;
+    border-radius: 1.25rem;
+  }
+
+  .iconWrapper,
+  .successIconContainer,
+  .resultIconWrapper {
+    width: 4rem;
+    height: 4rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .iconWrapper svg,
+  .successIconContainer svg,
+  .resultIconWrapper svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .button svg,
+  .analyzeButton svg,
+  .removeButton svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .title,
+  .fileName {
+    font-size: 1.1rem;
+  }
+
+  .subtitle {
+    margin-bottom: 1.25rem;
+  }
+
+  .analyzeButton {
+    height: 2.75rem;
+    padding: 0 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .successContainer:hover,
+  .resultContainer:hover {
+    transform: translateY(-2px);
+  }
+}
+
+
+/* ------------------------------------------------------------
+   480px — Large mobile
+   - Minimal padding using the agreed scale
+   - Further compact icons, text, and buttons
+   - Remove hover transforms (no true hover on touch)
+   ------------------------------------------------------------ */
+@media (max-width: 480px) {
+
+  .dropzone,
+  .successContainer,
+  .resultContainer {
+    padding: 1.5rem;
+    min-height: 16rem;
+    border-radius: 1rem;
+  }
+
+  .iconWrapper,
+  .successIconContainer,
+  .resultIconWrapper {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .iconWrapper svg,
+  .successIconContainer svg,
+  .resultIconWrapper svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .button svg,
+  .analyzeButton svg,
+  .removeButton svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .title {
+    font-size: 1rem;
+    margin-bottom: 0.375rem;
+  }
+
+  .subtitle {
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+  }
+
+
+  .button {
+    width: 100%;
+    height: 44px; 
+  }
+
+  .helperText {
+    font-size: 0.7rem;
+  }
+
+  .fileName {
+    font-size: 1rem;
+    padding: 0 0.5rem;
+  }
+
+  .fileSize {
+    font-size: 0.875rem;
+  }
+
+  .analyzeButton {
+    width: 100%;
+    height: 2.75rem;
+    font-size: 0.9rem;
+    padding: 0 1rem;
+  }
+
+  .dropzone:hover,
+  .successContainer:hover,
+  .resultContainer:hover {
+    transform: none;
+  }
+
+  .button:hover,
+  .analyzeButton:hover {
+    transform: none;
+  }
+
+  .removeButton {
+    height: 2.25rem;
+    width: 2.25rem;
+    top: 0.75rem;
+    right: 0.75rem;
+  }
 }

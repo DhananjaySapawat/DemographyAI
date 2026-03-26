@@ -298,3 +298,73 @@
   color: var(--text-primary);
   margin: 0;
 }
+
+
+@media (max-width: 768px) {
+  .container {
+    padding: 3rem 1.5rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .title {
+    font-size: 2.75rem;
+  }
+
+  .textGradient {
+    font-size: 2.5rem;
+  }
+
+  .description {
+    font-size: 1rem;
+  }
+
+  .visualShowcase {
+    order: -1; /* image above text on mobile */
+  }
+
+  .leftCard {
+    top: 1rem;
+    right: -0.5rem;
+  }
+
+  .rightCard {
+    bottom: 1rem;
+    left: -0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 2rem 1.2rem;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .textGradient {
+    font-size: 1.75rem;
+  }
+
+  .btnContainer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btnPrimary,
+  .btnSecondary {
+    justify-content: center;
+  }
+
+  .metricCard {
+    padding: 0.75rem;
+  }
+
+  .metricValue {
+    font-size: 1rem;
+  }
+}
