@@ -38,7 +38,6 @@ export default function CameraStream({ uploadFile, changeFile, status, error, se
     }
   };
 
-  
   const stopCamera = () => {
     stream?.getTracks().forEach((track) => track.stop());
     setStream(null);
@@ -84,10 +83,10 @@ export default function CameraStream({ uploadFile, changeFile, status, error, se
   return (
     <div className={styles.cameraContainer}>
       <div className={styles.cameraWrapper}>
-        {!stream && !capturedFile &&(
+        {!stream && !capturedFile && (
           <div className={styles.placeholder}>
             <div className={styles.cameraIcon}>
-              <Camera size={48} />
+              <Camera />
             </div>
             <h2 className={styles.placeholderTitle}>Use Your Camera</h2>
             <p className={styles.placeholderText}>Click below to start your camera</p>
@@ -95,7 +94,7 @@ export default function CameraStream({ uploadFile, changeFile, status, error, se
         )}
 
         {!capturedFile && (
-            <video ref={videoRef} autoPlay playsInline className={styles.video} />
+          <video ref={videoRef} autoPlay playsInline className={styles.video} />
         )}
 
         {capturedFile && (
@@ -107,9 +106,10 @@ export default function CameraStream({ uploadFile, changeFile, status, error, se
         )}
 
         <canvas ref={canvasRef} className={styles.hiddenCanvas} />
+
         {error && (
           <div className={styles.errorBanner}>
-            <AlertCircle size={16} className={styles.errorIcon} />
+            <AlertCircle className={styles.errorIcon} />
 
             <span className={styles.errorText}>{error}</span>
 
@@ -117,47 +117,45 @@ export default function CameraStream({ uploadFile, changeFile, status, error, se
               className={styles.errorClose}
               onClick={() => setError(null)}
             >
-              <X size={14} />
+              <X className={styles.errorCloseIcon} />
             </button>
           </div>
         )}
-        
       </div>
+
       <div className={styles.controls}>
         {!stream && !capturedFile && (
           <button onClick={startCamera} className={styles.primaryBtn}>
-            <Camera size={18} /> Start Camera
+            <Camera /> Start Camera
           </button>
         )}
 
         {stream && !capturedFile && (
           <button onClick={capturePhoto} className={styles.primaryBtn}>
-            <Circle size={18} /> Capture Photo
+            <Circle /> Capture Photo
           </button>
         )}
 
         {capturedFile && (
           <>
             <button
-              className={`${styles.analyzeButton} ${ status === "analyzing" ? "pointer-events-none" : ""}`}
+              className={`${styles.analyzeButton} ${status === "analyzing" ? "pointer-events-none" : ""}`}
               onClick={handleAnalyze}
               disabled={status === "analyzing"}
             >
               {status === "analyzing" ? "Analyzing..." : "Analyze Image"}
             </button>
 
-            <button 
-              className={`${styles.secondaryBtn} ${ status === "analyzing" ? "pointer-events-none" : ""}`}
+            <button
+              className={`${styles.secondaryBtn} ${status === "analyzing" ? "pointer-events-none" : ""}`}
               onClick={retakePhoto}
               disabled={status === "analyzing"}
             >
-              <RefreshCw size={18} /> Take Another
+              <RefreshCw /> Take Another
             </button>
           </>
         )}
-
       </div>
-
     </div>
   );
 }

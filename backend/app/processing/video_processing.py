@@ -2,9 +2,9 @@ import cv2
 from .image_utils import write_face_labels, extract_face_coordinates
 from app.ai import predict_attributes
 import time
+from pathlib import Path
 
-yunet_model_path = "app/processing/face_model/yunet_n_640_640.onnx"
-
+yunet_model_path = str(Path(__file__).parent / "face_model" / "yunet_n_640_640.onnx")
 
 def _compute_iou(boxA, boxB):
     xA = max(boxA[0], boxB[0])
@@ -41,6 +41,7 @@ class VideoProcessor:
 
         self.out = cv2.VideoWriter(self.output_path, self.fourcc, self.fps, (self.width, self.height))
         if not self.out.isOpened():
+            self.out.release()
             raise RuntimeError(f"Unable to open video writer: {output_path}")
 
         self.face_detector = cv2.FaceDetectorYN.create(
@@ -137,8 +138,6 @@ class VideoProcessor:
 
             frame_idx += 1
 
-        self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
-
     async def predict_values(self):
         # send ONLY one crop per unique person, keyed by their canonical face_id
         unique_faces = {
@@ -157,7 +156,7 @@ class VideoProcessor:
         self.faces_attributes = {
             face_id: canonical_predictions[self._track_to_face_id[track_id]]
             for face_id, track_id in self._face_id_to_track.items()
-            if self._track_to_face_id[track_id] in canonical_predictions
+            if self._track_to_face_id.get(track_id) in canonical_predictions
         }
 
     def write_face_attributes(self):
@@ -189,6 +188,9 @@ class VideoProcessor:
                 continue
             records.append({**rec, "attributes": attributes})
         return records
+
+    def unique_face_count(self):
+        return len(self._canonical_records)
 
     async def process(self):
         try:

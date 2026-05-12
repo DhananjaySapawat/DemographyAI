@@ -66,7 +66,10 @@ elif [ "$MODE" = "prod" ]; then
   bash -c "cd frontend && ./run.sh" &
   PID_FRONTEND=$!
 
-  wait $PID_MODEL $PID_BACKEND $PID_FRONTEND
+  bash -c "cd monitor && ./run.sh" &
+  PID_MONITOR=$!
+
+  wait $PID_MODEL $PID_BACKEND $PID_FRONTEND $PID_MONITOR
 
 
 elif [ "$MODE" = "local-docker" ]; then
@@ -88,7 +91,10 @@ elif [ "$MODE" = "local" ]; then
   bash -c "cd frontend && ./run.sh" &
   PID_FRONTEND=$!
 
-  wait $PID_MODEL $PID_BACKEND $PID_FRONTEND
+  bash -c "cd monitor && ./run.sh" &
+  PID_MONITOR=$!
+
+  wait $PID_MODEL $PID_BACKEND $PID_FRONTEND $PID_MONITOR
 
 
 elif [ "$MODE" = "dev" ]; then
@@ -104,7 +110,10 @@ elif [ "$MODE" = "dev" ]; then
   bash -c "cd frontend && ./run.sh" &
   PID_FRONTEND=$!
 
-  wait $PID_MODEL $PID_BACKEND $PID_FRONTEND
+  bash -c "cd monitor && ./run.sh" &
+  PID_MONITOR=$!
+
+  wait $PID_MODEL $PID_BACKEND $PID_FRONTEND $PID_MONITOR
 
 else
   echo "Unknown mode: $MODE"

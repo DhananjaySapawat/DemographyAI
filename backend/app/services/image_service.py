@@ -10,6 +10,7 @@ from app.utils import get_location
 from app.config import MAX_IMAGE_SIZE
 
 logger = logging.getLogger(__name__)
+db_commands = database.command
 
 
 class ImageService:
@@ -111,7 +112,7 @@ class ImageService:
     def _add_image_record(self, image_upload):
         logger.info("Saving image metadata to database")
 
-        return database.add_image({
+        return db_commands.add_image({
             "request_id": self.request_data.get("request_id"),
             "public_id": image_upload["id"],
             "image_url": image_upload["url"],
@@ -133,7 +134,7 @@ class ImageService:
 
         meta = self.face_metadata.get(face_id, {})
 
-        return database.add_face({
+        return db_commands.add_face({
             "image_id": self.image_id,
             "public_id": face_upload["id"],
             "image_url": face_upload["url"],
@@ -159,7 +160,7 @@ class ImageService:
     def _add_processed_image_record(self, processed_image_upload):
         logger.info("Saving processed image metadata")
 
-        return database.add_processed_image({
+        return db_commands.add_processed_image({
             "image_url": processed_image_upload["url"],
             "original_id": self.image_id,
             "public_id": processed_image_upload["id"],
@@ -169,7 +170,7 @@ class ImageService:
     async def _create_request_record(self):
         geo = await get_location(self.request_data.get("ip_address"))
 
-        database.add_request({
+        db_commands.add_request({
             "request_id":    self.request_data.get("request_id"),
             "endpoint":      self.request_data.get("endpoint"),
             "upload_type":   self.request_data.get("upload_type"),
@@ -186,7 +187,7 @@ class ImageService:
     async def _finalise_request_record(self, status="success", error_message=""):
         processing_time = int((time.monotonic() - self.start_time) * 1000)
 
-        database.update_request(self.request_data.get("request_id"), {
+        db_commands.update_request(self.request_data.get("request_id"), {
             "status":             status,
             "error_message":      error_message,
             "processing_time_ms": processing_time,
@@ -218,14 +219,14 @@ class ImageService:
 
     async def process_image(self):
         try:
+            self.error_step = "request"
+            await self._create_request_record()
+
             self.error_step = "read"
             await self._read_file()
 
             self.error_step = "detect"
             self._extract_faces()
-
-            self.error_step = "request"
-            await self._create_request_record()
 
             self.error_step = "upload"
             image_upload = self._upload_image(self.image)

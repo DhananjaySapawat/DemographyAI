@@ -2,8 +2,7 @@ import numpy as np
 import cv2
 from pathlib import Path
 
-yunet_model_path = "app/processing/face_model/yunet_n_640_640.onnx"
-
+yunet_model_path = str(Path(__file__).parent / "face_model" / "yunet_n_640_640.onnx")
 
 def buffer_to_cv(file):
     file_bytes = np.frombuffer(file, np.uint8)

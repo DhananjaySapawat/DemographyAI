@@ -358,7 +358,6 @@
   }
 }
 
-/* High performance mode for reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .resultContainer *,
   .resultContainer *::before,

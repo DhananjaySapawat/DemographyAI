@@ -10,7 +10,7 @@ def create_db_provider():
         return MongoDatabase(mongo_url)
 
     elif provider == "sqlite":
-        from .sqlite_db import SQLiteDatabase
+        from .sqlite import SQLiteDatabase
         sqlite_file_path = load_env("SQLITE_FILE_PATH") 
         return SQLiteDatabase(sqlite_file_path)
 

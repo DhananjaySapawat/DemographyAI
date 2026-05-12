@@ -46,3 +46,17 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
+
+  monitor:
+    build: ./monitor
+    container_name: demo_monitor
+    ports:
+      - "4000:4000"
+    environment:
+      APP_MODE: LOCAL
+      NEXT_PUBLIC_BASE_URL: http://${IP}:4000
+      NEXT_PUBLIC_BACKEND_URL: http://${IP}:8000
+
+    depends_on:
+      - backend
+    restart: unless-stopped

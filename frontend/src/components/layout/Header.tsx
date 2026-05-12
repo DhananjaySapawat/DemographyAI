@@ -45,7 +45,6 @@ export default function Header() {
         </div>
       </header>
 
-      {/* Mobile Header — shown only on small screens */}
       <div className={styles.mobileOnly}>
         <MobileHeader />
       </div>

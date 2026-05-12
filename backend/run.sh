@@ -20,6 +20,7 @@ echo "Detected local IP: $IP"
 export MODEL_URL="http://localhost:9000"
 export BASE_URL="http://localhost:8000"
 export FRONTEND_URL="http://$IP:3000"
+export MONITOR_FRONTEND_URL="http://$IP:4000"
 
 export SQLITE_FILE_PATH="local_storage/demographyAI.db"
 export LOCAL_UPLOAD_DIR="local_storage"

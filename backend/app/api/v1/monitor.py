@@ -1,24 +1,16 @@
-from fastapi import APIRouter
-from fastapi.responses import JSONResponse
-from app.providers import database 
+from fastapi import APIRouter, HTTPException
+from app.providers import database
 
+db_queries = database.query
 router = APIRouter()
 
-@router.get("/monitor/original")
-async def get_original_images():
-    return database.get_original_images()
+@router.get("/media")
+def get_media():
+    return db_queries.get_media()
 
-@router.get("/monitor/processed")
-async def get_processed_images():
-    return database.get_processed_images()
-
-
-@router.get("/monitor/videos")
-async def get_videos():
-    return database.get_videos()
-
-
-@router.get("/monitor/faces/{image_id}")
-async def get_faces_for_image(image_id: str):
-    return database.get_faces_for_image(image_id)
-
+@router.get("/media/{id}")
+def get_media_by_id(id: int):
+    item = db_queries.get_media_by_id(id)
+    if not item:
+        raise HTTPException(status_code=404, detail="Media not found")
+    return item

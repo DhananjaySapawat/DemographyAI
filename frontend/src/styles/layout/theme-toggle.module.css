@@ -1,0 +1,45 @@
+.toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  background: var(--bg-theme-hover);
+  border: 1px solid var(--border-dark);
+
+  color: var(--text-on-dark-secondary);
+}
+
+/* Hover */
+.toggle:hover {
+  background: var(--bg-accent-05);
+  color: var(--text-on-dark-primary);
+}
+
+/* Click effect */
+.toggle:active {
+  transform: scale(0.92);
+}
+
+/* Icon wrapper */
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 18px;
+  height: 18px;
+
+  transition: transform 0.3s ease;
+}
+
+/* Optional animation */
+.toggle:hover .icon {
+  transform: rotate(15deg);
+}

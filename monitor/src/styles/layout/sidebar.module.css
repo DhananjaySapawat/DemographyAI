@@ -1,0 +1,204 @@
+/* ============================================================
+   sidebar.module.css
+   ============================================================ */
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ── Shell ── */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 17rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-theme);
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem 1.375rem 1.375rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.logoBox {
+  display: grid;
+  place-items: center;
+  height: 2.5rem;
+  width: 2.5rem;
+  flex-shrink: 0;
+}
+
+.logoIcon {
+  height: 100%;
+  width: 100%;
+}
+
+.title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-on-dark-primary);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 0.675rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-on-dark-tertiary);
+  margin-top: 0.2rem;
+}
+
+/* ── Nav ── */
+.nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 1rem 0.875rem;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.nav::-webkit-scrollbar { display: none; }
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 1.125rem;
+  border-radius: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-on-dark-secondary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  opacity: 0;
+  animation: fadeInUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.navItem:nth-child(1) { animation-delay: 0.10s; }
+.navItem:nth-child(2) { animation-delay: 0.17s; }
+.navItem:nth-child(3) { animation-delay: 0.24s; }
+.navItem:nth-child(4) { animation-delay: 0.31s; }
+.navItem:nth-child(5) { animation-delay: 0.38s; }
+.navItem:nth-child(6) { animation-delay: 0.45s; }
+
+.navItem:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-on-dark-primary);
+}
+
+.navIcon {
+  width: 1.0625rem;
+  height: 1.0625rem;
+  flex-shrink: 0;
+}
+
+/* Active — matches .activeNavLink */
+.navItem.active {
+  background: var(--bg-accent);
+  color: var(--text-on-dark-primary);
+  font-weight: 600;
+}
+
+.navItem.active:hover {
+  background: var(--bg-accent);
+  color: var(--text-on-dark-primary);
+}
+
+/* ── Profile card ── */
+.profileCard {
+  margin: 0.875rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.875rem 1rem;
+  transition: background 0.2s ease;
+}
+
+.profileCard:hover {
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.profileContent {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  height: 2.25rem;
+  width: 2.25rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #818cf8 0%, var(--bg-accent) 100%);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.04em;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
+.profileInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.profileName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-on-dark-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.profileRole {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text-on-dark-tertiary);
+  margin-top: 0.1rem;
+  letter-spacing: 0.02em;
+}
+
+/* Logout button */
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text-on-dark-tertiary);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logoutBtn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--text-on-dark-primary);
+}
+
+.logoutIcon {
+  width: 0.9rem;
+  height: 0.9rem;
+}

@@ -13,6 +13,7 @@ from app.utils import get_location
 from app.config import MAX_VIDEO_SIZE
 
 logger = logging.getLogger(__name__)
+db_commands = database.command
 
 
 class VideoService:
@@ -87,7 +88,7 @@ class VideoService:
         self._height = self.video_processor.height
         self._fps = self.video_processor.fps
         self._total_frames = self.video_processor.total_frames
-        self._faces_detected = self.video_processor.face_count
+        self._faces_detected = self.video_processor.unique_face_count()
         self._frames_with_faces = sum(1 for v in self.video_processor.frame_face.values() if v)
         self._max_faces_in_frame = max((len(v) for v in self.video_processor.frame_face.values()), default=0)
         self._model_version = getattr(self.video_processor, "model_version", None)
@@ -102,7 +103,7 @@ class VideoService:
     def _add_video_record(self):
         logger.info("Saving video metadata")
 
-        self.video_id = database.add_video({
+        self.video_id = db_commands.add_video({
             "request_id": self.request_data.get("request_id"),
             "video_url": self.video_url,
             "original_filename": self._original_filename,
@@ -130,7 +131,7 @@ class VideoService:
 
         x1, y1, x2, y2 = bbox
 
-        return database.add_video_face({
+        return db_commands.add_video_face({
             "video_id": self.video_id,
             "public_id": face_upload["id"],
             "image_url": face_upload["url"],
@@ -185,7 +186,7 @@ class VideoService:
     async def _create_request_record(self):
         geo = await get_location(self.request_data.get("ip_address"))
 
-        database.add_request({
+        db_commands.add_request({
             "request_id":   self.request_data.get("request_id"),
             "endpoint":     self.request_data.get("endpoint"),
             "upload_type":  self.request_data.get("upload_type"),
@@ -202,7 +203,7 @@ class VideoService:
     async def _finalise_request_record(self, status="success", error_message=""):
         processing_time = int((time.monotonic() - self.start_time) * 1000)
 
-        database.update_request(self.request_data.get("request_id"), {
+        db_commands.update_request(self.request_data.get("request_id"), {
             "status":             status,
             "error_message":      error_message,
             "processing_time_ms": processing_time,
@@ -221,14 +222,14 @@ class VideoService:
             self.error_step = "prepare"
             self._prepare_temp_paths()
 
+            self.error_step = "request"
+            await self._create_request_record()
+
             self.error_step = "read"
             await self._save_uploaded_file()
 
             self.error_step = "transcode"
             await self._transcode_video()
-
-            self.error_step = "request"
-            await self._create_request_record()
 
             self.error_step = "upload"
             self._upload_processed_video()
