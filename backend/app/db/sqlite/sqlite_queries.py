@@ -49,7 +49,8 @@ class SQLiteQueries(BaseQueries):
                     i.height,
                     i.inference_time_ms,
                     i.created_at,
-                    r.status
+                    r.status,
+                    r.upload_type
                 FROM images i
                 LEFT JOIN requests r ON i.request_id = r.request_id
 
@@ -68,13 +69,14 @@ class SQLiteQueries(BaseQueries):
                     v.height,
                     v.inference_time_ms,
                     v.created_at,
-                    r.status
+                    r.status,
+                    r.upload_type
                 FROM videos v
                 LEFT JOIN requests r ON v.request_id = r.request_id
             )
             ORDER BY created_at DESC
         """)
-    
+        
     def get_media_by_id(self, id: int) -> dict | None:
         """
         Finds the item by id — checks images first, then videos.
@@ -87,6 +89,7 @@ class SQLiteQueries(BaseQueries):
                 'image' AS media_type,
                 i.*,
                 r.status, r.error_message, r.error_step,
+                r.upload_type,
                 r.ip_address, r.user_agent,
                 r.country_code, r.country_name, r.state, r.city,
                 r.processing_time_ms AS request_processing_time_ms
@@ -112,6 +115,7 @@ class SQLiteQueries(BaseQueries):
                 'video' AS media_type,
                 v.*,
                 r.status, r.error_message, r.error_step,
+                r.upload_type,
                 r.ip_address, r.user_agent,
                 r.country_code, r.country_name, r.state, r.city,
                 r.processing_time_ms AS request_processing_time_ms
