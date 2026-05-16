@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { X, User } from 'lucide-react';
 
@@ -13,10 +14,16 @@ import styles from '@/src/styles/media-gallery/media-gallery-drawer.module.css';
 
 interface Face {
   id:                   number;
+  image_id?:            number;
+  public_id?:           string | null;
   image_url:            string | null;
   face_index?:          number;
   frame_idx?:           number;
   face_idx?:            number;
+  face_x?:              number | null;
+  face_y?:              number | null;
+  face_width?:          number | null;
+  face_height?:         number | null;
   age_v1:               string | null;
   age_v1_confidence:    number | null;
   age_v2:               string | null;
@@ -27,15 +34,19 @@ interface Face {
   ethnicity_confidence: number | null;
   emotion:              string | null;
   emotion_confidence:   number | null;
+  model_version?:       string | null;
+  created_at?:          string | null;
 }
 
 interface MediaDetail {
   media_type:                  'image' | 'video';
   id:                          number;
   request_id:                  string | null;
+  public_id?:                  string | null;
   original_filename:           string | null;
   mime_type:                   string | null;
   image_url?:                  string | null;
+  image_hash?:                 string | null;
   size?:                       number | null;
   width?:                      number | null;
   height?:                     number | null;
@@ -58,7 +69,10 @@ interface MediaDetail {
   error_step:                  string | null;
   upload_type:                 string | null;
   ip_address:                  string | null;
+  user_agent?:                 string | null;
+  country_code?:               string | null;
   country_name:                string | null;
+  state?:                      string | null;
   city:                        string | null;
   request_processing_time_ms:  number | null;
   created_at:                  string | null;
@@ -66,7 +80,7 @@ interface MediaDetail {
 }
 
 interface Props {
-  id:      number;
+  requestId: string;
   onClose: () => void;
 }
 
@@ -105,6 +119,7 @@ function fmtDate(s: string | null | undefined): string {
   });
 }
 
+
 // ----------------------------------------------------------
 // sub-components
 // ----------------------------------------------------------
@@ -128,40 +143,60 @@ function StatusBadge({ status }: { status: string | null }) {
   );
 }
 
+interface FaceAttrLineProps {
+  label:       string;
+  value:       string | null | undefined;
+  confidence:  number | null | undefined;
+  capitalize?: boolean;
+}
+
+function FaceAttrLine({ label, value, confidence, capitalize = true }: FaceAttrLineProps) {
+  return (
+    <div className={styles.faceAttrLine}>
+      <span className={styles.faceAttrLineLabel}>{label}</span>
+      <span className={`${styles.faceAttrLineValue} ${capitalize ? styles.capitalize : ''}`}>
+        {value ?? '—'}
+      </span>
+      <span className={styles.faceAttrLineConf}>
+        {confidence != null
+          ? <span className={styles.conf}>{fmtConfidence(confidence)}</span>
+          : <span className={styles.confEmpty}>—</span>
+        }
+      </span>
+    </div>
+  );
+}
+
 function FaceChip({ face, index }: { face: Face; index: number }) {
+  const idx        = face.face_index ?? face.frame_idx ?? index;
   const frameLabel = face.frame_idx != null ? `Frame ${face.frame_idx}` : `Face ${index + 1}`;
 
   return (
     <div className={styles.faceChip}>
-      <div className={styles.faceAvatar}>
-        {face.image_url
-          ? <img src={face.image_url} alt={frameLabel} className={styles.faceImg} />
-          : <User size={14} className={styles.faceIcon} aria-hidden />
-        }
+
+      {/* ── Left: photo + index badge ── */}
+      <div className={styles.faceAvatarWrap}>
+        <div className={styles.faceAvatar}>
+          {face.image_url
+            ? <img src={face.image_url} alt={frameLabel} className={styles.faceImg} />
+            : <User size={24} className={styles.faceIcon} aria-hidden />
+          }
+        </div>
+        <span className={styles.faceIndexBadge}>#{idx}</span>
       </div>
+
+      {/* ── Right: attribute table ── */}
       <div className={styles.faceDetails}>
-        <div className={styles.facePrimary}>
-          {face.gender ?? '—'}
-          {face.gender_confidence != null && (
-            <span className={styles.conf}>{fmtConfidence(face.gender_confidence)}</span>
-          )}
+        <div className={styles.faceAttrHeader}>
+          <span>Attribute</span>
+          <span>Value</span>
+          <span>Conf.</span>
         </div>
-        <div className={styles.faceSecondary}>
-          {face.age_v2 ?? face.age_v1 ?? '—'}
-          {' · '}
-          {face.emotion ?? '—'}
-          {face.emotion_confidence != null && (
-            <span className={styles.conf}>{fmtConfidence(face.emotion_confidence)}</span>
-          )}
-        </div>
-        {face.ethnicity && (
-          <div className={styles.faceSecondary}>
-            {face.ethnicity}
-            {face.ethnicity_confidence != null && (
-              <span className={styles.conf}>{fmtConfidence(face.ethnicity_confidence)}</span>
-            )}
-          </div>
-        )}
+        <FaceAttrLine label="Age V1"    value={face.age_v1}    confidence={face.age_v1_confidence}    capitalize={false} />
+        <FaceAttrLine label="Age V2"    value={face.age_v2}    confidence={face.age_v2_confidence}    capitalize={false} />
+        <FaceAttrLine label="Gender"    value={face.gender}    confidence={face.gender_confidence} />
+        <FaceAttrLine label="Ethnicity" value={face.ethnicity} confidence={face.ethnicity_confidence} />
+        <FaceAttrLine label="Emotion"   value={face.emotion}   confidence={face.emotion_confidence} />
       </div>
     </div>
   );
@@ -173,10 +208,10 @@ function FaceChip({ face, index }: { face: Face; index: number }) {
 
 const FACE_LIMIT = 20;
 
-export default function MediaGalleryDrawer({ id, onClose }: Props) {
+export default function MediaGalleryDrawer({ requestId, onClose }: Props) {
   const [showProcessed, setShowProcessed] = useState(false);
 
-  const { data, loading, error } = useGet(getMediaById, [String(id)]);
+  const { data, loading, error } = useGet(getMediaById, [requestId]);
   const item = data as MediaDetail | undefined;
 
   const isVideo    = item?.media_type === 'video';
@@ -184,7 +219,7 @@ export default function MediaGalleryDrawer({ id, onClose }: Props) {
     ? item?.processed_image?.image_url
     : (isVideo ? item?.video_url : item?.image_url);
 
-  useEffect(() => { setShowProcessed(false); }, [id]);
+  useEffect(() => { setShowProcessed(false); }, [requestId]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -208,9 +243,20 @@ export default function MediaGalleryDrawer({ id, onClose }: Props) {
           <p className={styles.headerTitle} title={item?.original_filename ?? ''}>
             {loading ? 'Loading…' : (item?.original_filename ?? 'Media detail')}
           </p>
-          <button className={styles.closeBtn} onClick={onClose} aria-label="Close drawer">
-            <X size={15} />
-          </button>
+          <div className={styles.headerActions}>
+            {item?.request_id && (
+              <Link
+                href={`/media-gallery/${item.request_id}`}
+                className={styles.viewBtn}
+                aria-label="View full page"
+              >
+                View
+              </Link>
+            )}
+            <button className={styles.closeBtn} onClick={onClose} aria-label="Close drawer">
+              <X size={15} />
+            </button>
+          </div>
         </div>
 
         {/* ── Body ── */}
@@ -278,18 +324,34 @@ export default function MediaGalleryDrawer({ id, onClose }: Props) {
                 <h3 className={styles.sectionTitle}>Request</h3>
                 <MetaRow label="Status"      value={<StatusBadge status={item.status} />} />
                 <MetaRow label="Request ID"  value={
-                  <span className={styles.mono}>{item.request_id?.slice(0, 18)}…</span>
+                  <span className={styles.mono} title={item.request_id ?? ''}>{item.request_id?.slice(0, 18)}…</span>
                 } />
                 <MetaRow label="Upload type" value={item.upload_type?.replace(/_/g, ' ')} />
-                <MetaRow label="IP address"  value={item.ip_address} />
-                <MetaRow label="Location"    value={
-                  [item.city, item.country_name].filter(Boolean).join(', ') || null
+                <MetaRow label="IP address"   value={item.ip_address} />
+                <MetaRow label="Country"      value={
+                  item.country_name
+                    ? `${item.country_name}${item.country_code ? ` (${item.country_code})` : ''}`
+                    : null
                 } />
-                <MetaRow label="Created"     value={fmtDate(item.created_at)} />
-                <MetaRow label="Total time"  value={fmt(item.request_processing_time_ms, 'ms')} />
+                <MetaRow label="State"        value={item.state} />
+                <MetaRow label="City"         value={item.city} />
+                {item.user_agent && (
+                  <MetaRow label="User agent" value={
+                    <span className={styles.userAgent} title={item.user_agent}>
+                      {item.user_agent}
+                    </span>
+                  } />
+                )}
+                <MetaRow label="Created"    value={fmtDate(item.created_at)} />
+                <MetaRow label="Total time" value={fmt(item.request_processing_time_ms, ' ms')} />
                 {item.error_message && (
                   <MetaRow label="Error" value={
                     <span className={styles.errorText}>{item.error_message}</span>
+                  } />
+                )}
+                {item.error_step && (
+                  <MetaRow label="Error step" value={
+                    <span className={styles.errorText}>{item.error_step}</span>
                   } />
                 )}
               </section>
@@ -297,11 +359,11 @@ export default function MediaGalleryDrawer({ id, onClose }: Props) {
               {/* ── Media ── */}
               <section className={styles.section}>
                 <h3 className={styles.sectionTitle}>Media</h3>
-                <MetaRow label="Dimensions" value={`${item.width ?? '—'} × ${item.height ?? '—'}`} />
+                <MetaRow label="Dimensions" value={`${item.width ?? '—'} × ${item.height ?? '—'} px`} />
                 <MetaRow label="File size"  value={fmtSize(item.file_size ?? item.size)} />
                 <MetaRow label="MIME type"  value={item.mime_type} />
                 <MetaRow label="Model"      value={item.model_version} />
-                <MetaRow label="Inference"  value={fmt(item.inference_time_ms, 'ms')} />
+                <MetaRow label="Inference"  value={fmt(item.inference_time_ms, ' ms')} />
 
                 {isVideo ? (
                   <>
@@ -310,10 +372,27 @@ export default function MediaGalleryDrawer({ id, onClose }: Props) {
                     <MetaRow label="Total frames"     value={fmt(item.total_frames)} />
                     <MetaRow label="Frames w/ faces"  value={fmt(item.frames_with_faces)} />
                     <MetaRow label="Max faces/frame"  value={fmt(item.max_faces_in_frame)} />
-                    <MetaRow label="Transcode time"   value={fmt(item.transcode_time_ms, 'ms')} />
+                    <MetaRow label="Transcode time"   value={fmt(item.transcode_time_ms, ' ms')} />
                   </>
                 ) : (
-                  <MetaRow label="Face detect" value={fmt(item.face_detection_time_ms, 'ms')} />
+                  <>
+                    <MetaRow label="Face detect" value={fmt(item.face_detection_time_ms, ' ms')} />
+                    {item.image_hash && (
+                      <MetaRow label="Hash" value={
+                        <span className={styles.mono} title={item.image_hash}>
+                          {item.image_hash.slice(0, 16)}…
+                        </span>
+                      } />
+                    )}
+                  </>
+                )}
+
+                {item.public_id && (
+                  <MetaRow label="Public ID" value={
+                    <span className={styles.mono} title={item.public_id}>
+                      {item.public_id.slice(0, 18)}…
+                    </span>
+                  } />
                 )}
               </section>
 

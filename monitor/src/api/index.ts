@@ -8,7 +8,7 @@ const monitorBackendApi = createApi({
 export const getMediaList = () =>
   monitorBackendApi.get("/media");
 
-export const getMediaById = (mediaId: string) =>
-  monitorBackendApi.get(`/media/${mediaId}`);
+export const getMediaById = (requestId: string) =>
+  monitorBackendApi.get(`/media/${requestId}`);
 
 

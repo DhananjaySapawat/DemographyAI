@@ -12,6 +12,9 @@ class BaseCommands(ABC):
     def add_image(self, data: dict) -> int: ...
 
     @abstractmethod
+    def update_image(self, image_id: int, data: dict) -> None: ...
+
+    @abstractmethod
     def add_face(self, data: dict) -> int: ...
 
     @abstractmethod

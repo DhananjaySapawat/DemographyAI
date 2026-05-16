@@ -21,6 +21,7 @@ interface MediaItem {
   height:                 number | null;
   inference_time_ms:      number | null;
   created_at:             string | null;
+  request_id:             string | null;
   status:                 string | null;
   ip_address:             string | null;
   country_name:           string | null;
@@ -239,12 +240,11 @@ export default function MediaGalleryTable({ mediaList, loading, error }: Props) 
                     {/* view */}
                     <td className={styles.td}>
                       <Link
-                        href={`/media-gallery/${item.id}`}
+                        href={`/media-gallery/${item.request_id}`}
                         className={styles.viewBtn}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        onClick={e => e.stopPropagation()}
+                        aria-label={`View ${item.original_filename || 'item'}`}
                       >
-                        <ExternalLink size={11} aria-hidden />
                         View
                       </Link>
                     </td>

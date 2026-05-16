@@ -18,5 +18,5 @@ def predict_age(input_data):
 
     return {
         "label": int(age),
-        "confidence": None
+        "confidence": 1
     }

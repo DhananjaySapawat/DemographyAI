@@ -80,7 +80,6 @@ export default function Webcam() {
 
             const predictions = await blazeModel.estimateFaces(video, false);
             const face_details = await analyzeFaces(model, video, predictions);
-            console.log(face_details)
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawMesh(ctx, displayWidth/videoWidth, displayHeight/videoHeight, predictions);     

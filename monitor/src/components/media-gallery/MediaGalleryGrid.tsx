@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 import { User, ImageIcon, VideoIcon } from 'lucide-react';
 
@@ -21,6 +22,7 @@ interface MediaItem {
   width:              number | null;
   height:             number | null;
   inference_time_ms:  number | null;
+  request_id:         string | null;
   created_at:         string | null;
   status:             string | null;
   upload_type:        string | null;
@@ -96,11 +98,10 @@ function SkeletonCard() {
 }
 
 function MediaCard({ item, onClick }: { item: MediaItem; onClick: () => void }) {
-  const isVideo  = item.media_type === 'video';
-  const isError  = item.status === 'error';
-  const faces    = item.face_count ?? 0;
+  const isVideo = item.media_type === 'video';
+  const isError = item.status === 'error';
+  const faces   = item.face_count ?? 0;
 
-  // Right-side chip: prefer inference_time for videos, filesize for images
   const rightChip = item.inference_time_ms
     ? `${item.inference_time_ms.toLocaleString()}ms`
     : formatFileSize(item.file_size);
@@ -146,18 +147,15 @@ function MediaCard({ item, onClick }: { item: MediaItem; onClick: () => void }) 
           </div>
         )}
 
-        {/* type */}
         <span className={`${styles.typeBadge} ${isVideo ? styles.typeBadgeVideo : styles.typeBadgeImage}`}>
           {item.media_type}
         </span>
 
-        {/* face count — always shown, styled by value */}
         <span className={`${styles.faceBadge} ${faceBadgeClass(item.face_count)}`}>
           <User size={9} aria-hidden />
           <span>{faces}</span>
         </span>
 
-        {/* upload type — revealed on hover */}
         {item.upload_type && (
           <span className={styles.uploadTypeBadge}>
             {formatUploadType(item.upload_type)}
@@ -189,13 +187,24 @@ function MediaCard({ item, onClick }: { item: MediaItem; onClick: () => void }) 
             <span className={`${styles.statusDot} ${isError ? styles.statusDotError : styles.statusDotOk}`} />
             <span className={styles.dateLabel}>{formatDate(item.created_at)}</span>
           </div>
-          <span className={styles.metaChip}>{rightChip}</span>
+
+          <div className={styles.footerRight}>
+            <span className={styles.metaChip}>{rightChip}</span>
+
+            <Link
+              href={`/media-gallery/${item.request_id}`}
+              className={styles.viewBtn}
+              onClick={e => e.stopPropagation()}
+              aria-label={`View ${item.original_filename || 'item'}`}
+            >
+              View
+            </Link>
+          </div>
         </div>
       </div>
     </article>
   );
 }
-
 // ----------------------------------------------------------
 // main
 // ----------------------------------------------------------
@@ -203,7 +212,7 @@ function MediaCard({ item, onClick }: { item: MediaItem; onClick: () => void }) 
 const SKELETON_COUNT = 12;
 
 export default function MediaGalleryGrid({ mediaList, loading, error }: Props) {
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
 
   if (error) {
     return (
@@ -216,7 +225,6 @@ export default function MediaGalleryGrid({ mediaList, loading, error }: Props) {
       </div>
     );
   }
-
   return (
     <>
       <div className={styles.wrapper}>
@@ -235,19 +243,19 @@ export default function MediaGalleryGrid({ mediaList, loading, error }: Props) {
               )
               : mediaList.map(item => (
                 <MediaCard
-                  key={`${item.media_type}-${item.id}`}
+                  key={`${item.media_type}-${item.request_id}`}
                   item={item}
-                  onClick={() => setSelectedId(item.id)}
+                  onClick={() => setSelectedRequestId(item.request_id)}
                 />
               ))
           }
         </div>
       </div>
 
-      {selectedId !== null && (
+      {selectedRequestId !== null && (
         <MediaGalleryDrawer
-          id={selectedId}
-          onClose={() => setSelectedId(null)}
+          requestId={selectedRequestId}
+          onClose={() => setSelectedRequestId(null)}
         />
       )}
     </>
