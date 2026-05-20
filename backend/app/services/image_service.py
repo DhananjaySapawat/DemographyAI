@@ -18,14 +18,14 @@ async def _run_sync(fn, *args, **kwargs):
     loop = asyncio.get_event_loop()
     return await loop.run_in_executor(None, partial(fn, *args, **kwargs))
 
-
 class ImageService:
-    def __init__(self, file, request_data):
+    def __init__(self, file, request_data, request_url):
         if file is None:
             raise ValueError("File object is required")
 
         self.file = file
         self.request_data = request_data
+        self.request_url = request_url
         self.start_time = time.monotonic()
 
         self.result = {"original_source": "", "faces": []}
@@ -125,7 +125,7 @@ class ImageService:
         return db_commands.add_image({
             "request_id":           self.request_data.get("request_id"),
             "public_id":            image_upload["id"],
-            "image_url":            image_upload["url"],
+            "image_key":            image_upload["key"],
             "original_filename":    self._original_filename,
             "mime_type":            self._mime_type,
             "image_hash":           self._image_hash,
@@ -151,7 +151,7 @@ class ImageService:
         return db_commands.add_face({
             "image_id":              self.image_id,
             "public_id":             face_upload["id"],
-            "image_url":             face_upload["url"],
+            "image_key":             face_upload["key"],
             "face_index":            meta.get("face_index"),
             "face_x":                meta.get("face_x"),
             "face_y":                meta.get("face_y"),
@@ -175,7 +175,7 @@ class ImageService:
         logger.info("Saving processed image metadata")
 
         return db_commands.add_processed_image({
-            "image_url":   processed_image_upload["url"],
+            "image_key":   processed_image_upload["key"],
             "original_id": self.image_id,
             "public_id":   processed_image_upload["id"],
             "created_at":  datetime.now(),
@@ -285,14 +285,14 @@ class ImageService:
                     )
                     continue
 
-                self._add_result(face_upload["url"], face_id, attribute)
+                self._add_result(storage.url(face_upload["key"], self.request_url), face_id, attribute)
 
             processed_image = self._get_processed_image()
 
             processed_image_upload = await _run_sync(self._upload_image, processed_image)
             self._orphaned_uploads.append(processed_image_upload["id"])
 
-            self.result["original_source"] = processed_image_upload["url"]
+            self.result["original_source"] = storage.url(processed_image_upload["key"], self.request_url)
             await _run_sync(self._add_processed_image_record, processed_image_upload)
             self._orphaned_uploads.remove(processed_image_upload["id"])
 

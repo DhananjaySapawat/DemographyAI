@@ -1,4 +1,4 @@
-from app.config import STORAGE_PROVIDER
+from app.config import STORAGE_PROVIDER, LOCAL_UPLOAD_DIR
 from app.utils import load_env
 
 def create_storage_provider():
@@ -17,12 +17,14 @@ def create_storage_provider():
         )
     
     elif provider == "local":
-        upload_root = load_env("LOCAL_UPLOAD_DIR")    
-        base_url = load_env("BASE_URL")    
+        
+        local_base_url = load_env("LOCAL_BASE_URL")
+        base_url = load_env("BASE_URL")
 
         from .local_storage import LocalStorage
         return LocalStorage(
-            upload_root=upload_root,
+            upload_root=LOCAL_UPLOAD_DIR,
+            local_base_url=local_base_url,
             base_url=base_url
         )
 

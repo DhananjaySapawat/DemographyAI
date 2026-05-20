@@ -32,7 +32,7 @@ export default function AnalysisResult({ analysisResult, sourceType }: { analysi
 
           :
           <img
-            src={original_source.replace("http://localhost:8000", (process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"))}
+            src={original_source}
             alt="Uploaded image used for face analysis"
             className={styles.originalImage}
           />

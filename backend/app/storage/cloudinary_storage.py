@@ -1,6 +1,7 @@
 import cloudinary
 import cloudinary.uploader
 from .base import BaseStorage
+
 class CloudinaryStorage(BaseStorage):
     def __init__(self, cloud_name, api_key, api_secret):
         cloudinary.config( 
@@ -17,7 +18,7 @@ class CloudinaryStorage(BaseStorage):
             raise ValueError(f"Cloudinary image upload failed: {e}")
 
         return {
-            "url": upload["secure_url"],
+            "key": upload["secure_url"],
             "id": upload["public_id"]
         }
 
@@ -30,4 +31,10 @@ class CloudinaryStorage(BaseStorage):
         except Exception as e:
             raise ValueError(f"Cloudinary video upload failed: {e}")
 
-        return upload["secure_url"]
+        return {
+            "key": upload["secure_url"],
+            "id": upload["public_id"]
+        }
+    
+    def url(self, key: str, request_url: str) -> str:
+        return key

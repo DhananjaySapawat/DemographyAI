@@ -32,8 +32,10 @@ async def detect_image(
             "user_agent": request.headers.get("user-agent"),
         }
 
-        image_service = ImageService(file, request_data)
+        request_url = request.headers.get("origin") or str(request.base_url)
+        image_service = ImageService(file, request_data, request_url)
         result = await image_service.process_image()
+        
         return {"result": result}
     
     except ValueError as e:
@@ -64,9 +66,10 @@ async def detect_video_upload(request: Request, file: UploadFile = File(...)):
             "user_agent": request.headers.get("user-agent"),
         }
 
-        video_service = VideoService(file, request_data)
+        request_url = request.headers.get("origin") or str(request.base_url)
+        video_service = VideoService(file, request_data, request_url)
         result = await video_service.process_video()
-
+        
         return {"result": result}
 
     except ValueError as e:

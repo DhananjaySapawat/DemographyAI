@@ -1,5 +1,5 @@
 import sqlite3
-import threading  # CHANGE: imported for per-thread connection management
+import threading
 from app.db.base import BaseCommands
 
 
@@ -9,10 +9,6 @@ class SQLiteCommands(BaseCommands):
         self.db_path = db_path
         self._local = threading.local()
         self._init_db()
-
-    # ----------------------------------------------------------
-    # internal helpers
-    # ----------------------------------------------------------
 
     def _get_connection(self):
         if not getattr(self._local, "conn", None):
@@ -31,14 +27,6 @@ class SQLiteCommands(BaseCommands):
         return cursor.lastrowid
 
     def _init_db(self):
-        """
-        Creates all tables if they don't already exist.
-        Safe to call repeatedly — uses IF NOT EXISTS throughout.
-        Table order respects foreign-key dependencies:
-          requests → images → faces
-                   → processed_images
-          requests → videos → video_faces
-        """
         conn = self._get_connection()
         cursor = conn.cursor()
 
@@ -73,7 +61,7 @@ class SQLiteCommands(BaseCommands):
                 id                      INTEGER PRIMARY KEY AUTOINCREMENT,
                 request_id              TEXT REFERENCES requests(request_id),
                 public_id               TEXT,
-                image_url               TEXT,
+                image_key               TEXT,           
                 original_filename       TEXT,
                 mime_type               TEXT,
                 image_hash              TEXT,
@@ -94,7 +82,7 @@ class SQLiteCommands(BaseCommands):
                 id                   INTEGER PRIMARY KEY AUTOINCREMENT,
                 image_id             INTEGER REFERENCES images(id),
                 public_id            TEXT,
-                image_url            TEXT,
+                image_key            TEXT,              
                 face_index           INTEGER,
                 face_x               INTEGER,
                 face_y               INTEGER,
@@ -121,7 +109,7 @@ class SQLiteCommands(BaseCommands):
                 id          INTEGER PRIMARY KEY AUTOINCREMENT,
                 original_id INTEGER REFERENCES images(id),
                 public_id   TEXT,
-                image_url   TEXT,
+                image_key   TEXT,                      
                 created_at  DATETIME
             )
         """)
@@ -131,7 +119,8 @@ class SQLiteCommands(BaseCommands):
             CREATE TABLE IF NOT EXISTS videos (
                 id                  INTEGER PRIMARY KEY AUTOINCREMENT,
                 request_id          TEXT REFERENCES requests(request_id),
-                video_url           TEXT,
+                public_id           TEXT,               
+                video_key           TEXT,               
                 original_filename   TEXT,
                 mime_type           TEXT,
                 original_format     TEXT,
@@ -159,7 +148,7 @@ class SQLiteCommands(BaseCommands):
                 id                   INTEGER PRIMARY KEY AUTOINCREMENT,
                 video_id             INTEGER REFERENCES videos(id),
                 public_id            TEXT,
-                image_url            TEXT,
+                image_key            TEXT,              
                 frame_idx            INTEGER,
                 face_idx             INTEGER,
                 face_x               INTEGER,

@@ -25,17 +25,18 @@ async def _run_sync(fn, *args, **kwargs):
 
 class VideoService:
 
-    def __init__(self, file, request_data):
+    def __init__(self, file, request_data, request_url):  
         if file is None:
             raise ValueError("File object is required")
 
         self.file = file
         self.request_data = request_data
+        self.request_url = request_url 
         self.start_time = time.monotonic()
 
         self.raw_path = None
         self.processed_path = None
-        self.video_url = None
+        self.video_upload = None   
         self.video_id = None
 
         self._original_format = Path(self.file.filename).suffix.lstrip(".")
@@ -108,35 +109,34 @@ class VideoService:
 
     async def _upload_processed_video(self):
         logger.info("Uploading processed video")
-        self.video_url = await _run_sync(storage.upload_video, self.processed_path)
-        logger.info(f"Video uploaded | url={self.video_url}")
-
+        self.video_upload = await _run_sync(storage.upload_video, self.processed_path)
+        logger.info(f"Video uploaded | key={self.video_upload['key']}") 
 
     async def _add_video_record(self):
         logger.info("Saving video metadata")
 
-
         self.video_id = await _run_sync(db_commands.add_video, {
-            "request_id":        self.request_data.get("request_id"),
-            "video_url":         self.video_url,
-            "original_filename": self._original_filename,
-            "mime_type":         self._mime_type,
-            "original_format":   self._original_format,
-            "processed_format":  "webm",
-            "file_size":         self._file_size,
-            "video_hash":        self._video_hash,
-            "width":             getattr(self, "_width", None),
-            "height":            getattr(self, "_height", None),
-            "fps":               getattr(self, "_fps", None),
-            "total_frames":      getattr(self, "_total_frames", None),
-            "duration_seconds":  getattr(self, "_duration_seconds", None),
-            "faces_detected":    getattr(self, "_faces_detected", None),
-            "frames_with_faces": getattr(self, "_frames_with_faces", None),
-            "max_faces_in_frame":getattr(self, "_max_faces_in_frame", None),
-            "model_version":     getattr(self, "_model_version", None),
-            "transcode_time_ms": getattr(self, "_transcode_time_ms", None),
-            "inference_time_ms": getattr(self, "_inference_time_ms", None),
-            "created_at":        datetime.now(),
+            "request_id":         self.request_data.get("request_id"),
+            "public_id":          self.video_upload["id"],    
+            "video_key":          self.video_upload["key"],   
+            "original_filename":  self._original_filename,
+            "mime_type":          self._mime_type,
+            "original_format":    self._original_format,
+            "processed_format":   "webm",
+            "file_size":          self._file_size,
+            "video_hash":         self._video_hash,
+            "width":              getattr(self, "_width", None),
+            "height":             getattr(self, "_height", None),
+            "fps":                getattr(self, "_fps", None),
+            "total_frames":       getattr(self, "_total_frames", None),
+            "duration_seconds":   getattr(self, "_duration_seconds", None),
+            "faces_detected":     getattr(self, "_faces_detected", None),
+            "frames_with_faces":  getattr(self, "_frames_with_faces", None),
+            "max_faces_in_frame": getattr(self, "_max_faces_in_frame", None),
+            "model_version":      getattr(self, "_model_version", None),
+            "transcode_time_ms":  getattr(self, "_transcode_time_ms", None),
+            "inference_time_ms":  getattr(self, "_inference_time_ms", None),
+            "created_at":         datetime.now(),
         })
 
     async def _add_video_face_record(self, face_id, frame_idx, face_idx, bbox, attributes, face_upload):
@@ -144,29 +144,28 @@ class VideoService:
 
         x1, y1, x2, y2 = bbox
 
-        # CHANGE: wrapped in _run_sync — blocking SQLite INSERT.
         return await _run_sync(db_commands.add_video_face, {
-            "video_id":           self.video_id,
-            "public_id":          face_upload["id"],
-            "image_url":          face_upload["url"],
-            "frame_idx":          frame_idx,
-            "face_idx":           face_idx,
-            "face_x":             x1,
-            "face_y":             y1,
-            "face_width":         x2 - x1,
-            "face_height":        y2 - y1,
-            "age_v1":             attributes.get("age_v1", {}).get("label"),
-            "age_v1_confidence":  attributes.get("age_v1", {}).get("confidence"),
-            "age_v2":             attributes.get("age_v2", {}).get("label"),
-            "age_v2_confidence":  attributes.get("age_v2", {}).get("confidence"),
-            "gender":             attributes.get("gender", {}).get("label"),
-            "gender_confidence":  attributes.get("gender", {}).get("confidence"),
-            "ethnicity":          attributes.get("ethnicity", {}).get("label"),
+            "video_id":             self.video_id,
+            "public_id":            face_upload["id"],
+            "image_key":            face_upload["key"],  
+            "frame_idx":            frame_idx,
+            "face_idx":             face_idx,
+            "face_x":               x1,
+            "face_y":               y1,
+            "face_width":           x2 - x1,
+            "face_height":          y2 - y1,
+            "age_v1":               attributes.get("age_v1", {}).get("label"),
+            "age_v1_confidence":    attributes.get("age_v1", {}).get("confidence"),
+            "age_v2":               attributes.get("age_v2", {}).get("label"),
+            "age_v2_confidence":    attributes.get("age_v2", {}).get("confidence"),
+            "gender":               attributes.get("gender", {}).get("label"),
+            "gender_confidence":    attributes.get("gender", {}).get("confidence"),
+            "ethnicity":            attributes.get("ethnicity", {}).get("label"),
             "ethnicity_confidence": attributes.get("ethnicity", {}).get("confidence"),
-            "emotion":            attributes.get("emotion", {}).get("label"),
-            "emotion_confidence": attributes.get("emotion", {}).get("confidence"),
-            "model_version":      self._model_version,
-            "created_at":         datetime.now(),
+            "emotion":              attributes.get("emotion", {}).get("label"),
+            "emotion_confidence":   attributes.get("emotion", {}).get("confidence"),
+            "model_version":        self._model_version,
+            "created_at":           datetime.now(),
         })
 
     async def _save_video_faces(self):
@@ -196,11 +195,10 @@ class VideoService:
                     f"Failed to write video face record for {face_id} — "
                     "upload is orphaned and will require manual cleanup"
                 )
-    
                 continue
 
             faces.append({
-                "image_url": face_upload["url"],
+                "image_url": storage.url(face_upload["key"], self.request_url),
                 "face_idx":  response_idx,
                 **attributes,
             })
@@ -271,11 +269,9 @@ class VideoService:
             self.error_step = "upload"
             await self._upload_processed_video()
 
-            self._orphaned_uploads.append(self.video_url)
-
+            self._orphaned_uploads.append(self.video_upload["id"])
             await self._add_video_record()
-
-            self._orphaned_uploads.remove(self.video_url)
+            self._orphaned_uploads.remove(self.video_upload["id"])
 
             self.error_step = "save_faces"
             faces = await self._save_video_faces()
@@ -286,7 +282,7 @@ class VideoService:
             logger.info("Video processing finished successfully")
 
             return {
-                "original_source": self.video_url,
+                "original_source": storage.url(self.video_upload["key"], self.request_url),
                 "faces": faces,
             }
 

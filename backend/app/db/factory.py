@@ -1,4 +1,4 @@
-from app.config import DB_PROVIDER
+from app.config import DB_PROVIDER, LOCAL_UPLOAD_DIR
 from app.utils import load_env
 
 def create_db_provider():
@@ -11,8 +11,8 @@ def create_db_provider():
 
     elif provider == "sqlite":
         from .sqlite import SQLiteDatabase
-        sqlite_file_path = load_env("SQLITE_FILE_PATH") 
-        return SQLiteDatabase(sqlite_file_path)
+        sqlite_file = load_env("SQLITE_FILE") 
+        return SQLiteDatabase(f"{LOCAL_UPLOAD_DIR}/{sqlite_file}")
 
     else:
         raise ValueError(f"Unknown DB_PROVIDER: {DB_PROVIDER}")

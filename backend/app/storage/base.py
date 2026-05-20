@@ -9,3 +9,7 @@ class BaseStorage(ABC):
     @abstractmethod
     def upload_video(self, video_path: str) -> str:
         pass
+
+    @abstractmethod
+    def url(self, key: str, request_url: str) -> str:
+        pass

@@ -1,17 +1,11 @@
 import os
-from app.config import STORAGE_PROVIDER
+from app.config import LOCAL_UPLOAD_DIR
 from fastapi.staticfiles import StaticFiles
 
-from app.utils import load_env
-
 def init_startup(app):
-    provider = STORAGE_PROVIDER.lower()
 
-    if provider == "local":
-        upload_root = load_env("LOCAL_UPLOAD_DIR")  
-        os.makedirs(upload_root, exist_ok=True)
-        app.mount("/uploads", StaticFiles(directory=upload_root), name="uploads")
-        print(f"Mounted local storage at /uploads → {upload_root}")
+    os.makedirs(LOCAL_UPLOAD_DIR, exist_ok=True)
+    app.mount("/uploads", StaticFiles(directory=LOCAL_UPLOAD_DIR), name="uploads")
 
     @app.on_event("startup")
     async def startup_event():
