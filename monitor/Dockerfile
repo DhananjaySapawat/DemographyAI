@@ -2,14 +2,19 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package.json package-lock.json* ./
+ARG NEXT_PUBLIC_BASE_URL
+ARG NEXT_PUBLIC_BACKEND_URL
 
-RUN npm install
+ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
+ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
+ENV PORT=4000
+
+COPY package*.json ./
+RUN npm ci
 
 COPY . .
-
-RUN npm run build
+#RUN npm run build
 
 EXPOSE 4000
 
-CMD ["npm","start"]
+CMD ["npm", "run", "dev"]

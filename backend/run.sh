@@ -1,93 +1,63 @@
 #!/bin/bash
+set -euo pipefail
 
-MODE=${APP_MODE:-dev}
-PORT=${API_PORT:-8000}
+: "${BACKEND_PORT:?BACKEND_PORT is not set}"
+: "${MODEL_PORT:?MODEL_PORT is not set}"
+: "${LAUNCH_MODE:?LAUNCH_MODE is not set}"
+: "${IP:?IP is not set}"
 
-echo "Backend starting..."
-echo "Mode: $MODE"
+export MODEL_URL="http://localhost:$MODEL_PORT"
+export LOCAL_BASE_URL="http://localhost:$BACKEND_PORT"
+export BASE_URL="http://$IP:$BACKEND_PORT"
 
-# -----------------------------
-# Detect local IP
-# -----------------------------
+echo "[backend] port=$BACKEND_PORT  model=$MODEL_URL  base=$BASE_URL"
 
-IP=$(hostname -I | awk '{print $1}')
+if command -v conda &>/dev/null; then
+  source "$(conda info --base)/etc/profile.d/conda.sh"
+  ENV_NAME="tle_backend"
+  if ! conda env list | grep -q "$ENV_NAME"; then
+    echo "[backend] creating conda env $ENV_NAME..."
+    conda create -y -n "$ENV_NAME" python=3.11
+  fi
+  conda activate "$ENV_NAME"
+  pip install -q -r requirements.txt
+else
+  echo "[backend] WARNING: conda not found, using system python" >&2
+fi
 
-echo "Detected local IP: $IP"
-
-# -----------------------------
-# ENV VARS
-# -----------------------------
-export MODEL_URL="http://localhost:9000"
-export LOCAL_BASE_URL="http://localhost:8000"
-export BASE_URL="http://$IP:8000"
-
-# -----------------------------
-# CONDA ENV SETUP
-# -----------------------------
 
 if command -v conda &> /dev/null; then
-
-    echo "Conda detected"
-
+    echo "[backend] Conda detected"
     source "$(conda info --base)/etc/profile.d/conda.sh"
-
     ENV_NAME="demo_backend"
 
     if ! conda env list | grep -q "$ENV_NAME"; then
-      echo "Creating conda environment..."
-
+      echo "[backend] Creating conda environment..."
       conda create -y -n $ENV_NAME python=3.11
       conda activate $ENV_NAME
-
       pip install -r requirements.txt
 
     else
-      echo "Using existing conda environment"
       conda activate $ENV_NAME
     fi
 
-  else
-    echo "⚠ Conda not found"
-
-fi
-
-# -----------------------------
-# MODE CONFIG
-# -----------------------------
-
-if [[ "$MODE" == "dev" ]]; then
-
-  echo "⚡ DEV mode"
-  export MODE="LOCAL"
-
-  uvicorn app.main:app \
-    --host 0.0.0.0 \
-    --port $PORT \
-    --reload
-
-
-elif [[ "$MODE" == "local" ]]; then
-
-  echo "🖥 LOCAL production mode"
-  export MODE="LOCAL"
-
-  gunicorn app.main:app \
-    -k uvicorn.workers.UvicornWorker \
-    -w $(nproc) \
-    -b 0.0.0.0:$PORT
-
-
-elif [[ "$MODE" == "prod" ]]; then
-
-  echo "🚀 PRODUCTION mode"
-  export MODE="PRODUCTION"
-
-  gunicorn app.main:app \
-    -k uvicorn.workers.UvicornWorker \
-    -w $(nproc) \
-    -b 0.0.0.0:$PORT
-
 else
-  echo "Unknown mode: $MODE"
-  exit 1
+  echo "[backend] WARNING: conda not found, using system python" >&2
 fi
+
+case "$LAUNCH_MODE" in
+  dev)
+    exec uvicorn app.main:app --host 0.0.0.0 --port "$BACKEND_PORT" --reload
+    ;;
+  prod)
+    exec gunicorn app.main:app \
+      -k uvicorn.workers.UvicornWorker \
+      -w "$(nproc)" \
+      -b "0.0.0.0:$BACKEND_PORT" \
+      --timeout 120
+    ;;
+  *)
+    echo "[backend] ERROR: unknown LAUNCH_MODE '$LAUNCH_MODE'" >&2
+    exit 1
+    ;;
+esac

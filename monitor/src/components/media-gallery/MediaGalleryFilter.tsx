@@ -95,7 +95,6 @@ export default function MediaGalleryFilter() {
     [data, tab, search, status, type, minFaces, sort]
   );
 
-  console.log(filteredData)
 
   return (
     <>

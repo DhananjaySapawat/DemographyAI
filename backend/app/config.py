@@ -1,7 +1,6 @@
 from app.utils import load_env
 
-
-MODE = load_env("MODE") 
+DEPLOY_MODE = load_env("DEPLOY_MODE") 
 MODEL_URL = load_env("MODEL_URL")
 STORAGE_PROVIDER = load_env("STORAGE_PROVIDER")
 DB_PROVIDER = load_env("DB_PROVIDER")
@@ -10,7 +9,7 @@ DB_PROVIDER = load_env("DB_PROVIDER")
 # Required variable validation
 # -----------------------------
 _REQUIRED = {
-    "MODE": MODE,
+    "DEPLOY_MODE": DEPLOY_MODE,
     "MODEL_URL": MODEL_URL,
     "STORAGE_PROVIDER": STORAGE_PROVIDER,
     "DB_PROVIDER": DB_PROVIDER,
@@ -39,7 +38,7 @@ LOCAL_UPLOAD_DIR = "local_storage"
 # -----------------------------
 # Allowed Origins
 # -----------------------------
-if MODE == "production":
+if DEPLOY_MODE == "production":
     FRONT_END_URL = load_env("FRONT_END_URL")
     MONITOR_FRONTEND_URL = load_env("MONITOR_FRONTEND_URL")
 

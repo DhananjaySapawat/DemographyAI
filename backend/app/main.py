@@ -25,6 +25,7 @@ app = FastAPI(title=f"{WEBSITE_NAME}-BACKEND")
 # -----------------------------
 # CORS Middleware
 # -----------------------------
+print(f"Allowed Origins: {ALLOWED_ORIGINS}")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,   

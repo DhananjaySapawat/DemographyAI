@@ -1,70 +1,35 @@
 #!/bin/bash
+set -euo pipefail
 
-MODE=${APP_MODE:-dev}
+: "${FRONTEND_PORT:?FRONTEND_PORT is not set}"
+: "${BACKEND_PORT:?BACKEND_PORT is not set}"
+: "${LAUNCH_MODE:?LAUNCH_MODE is not set}"
+: "${IP:?IP is not set}"
 
-echo "Frontend starting..."
-echo "Mode: $MODE"
+export NEXT_PUBLIC_BASE_URL="http://$IP:$FRONTEND_PORT"
+export NEXT_PUBLIC_BACKEND_URL="http://$IP:$BACKEND_PORT"
 
-# -----------------------------
-# Detect local IP
-# -----------------------------
-
-IP=$(hostname -I | awk '{print $1}')
-
-if [ -z "$IP" ]; then
-  IP="localhost"
-fi
-
-echo "Detected local IP: $IP"
-
-# -----------------------------
-# ENV VARS
-# -----------------------------
-
-export NEXT_PUBLIC_BASE_URL="http://$IP:3000"
-export NEXT_PUBLIC_BACKEND_URL="http://$IP:8000"
-
-echo "Frontend URL: $NEXT_PUBLIC_BASE_URL"
-echo "Backend URL:  $NEXT_PUBLIC_BACKEND_URL"
-
-# -----------------------------
-# NODE SETUP
-# -----------------------------
+echo "[frontend] url=$NEXT_PUBLIC_BASE_URL  backend=$NEXT_PUBLIC_BACKEND_URL"
 
 if ! command -v npm &> /dev/null; then
   echo "⚠ npm not found"
   exit 1
 fi
-
-# install dependencies if missing
 if [ ! -d "node_modules" ]; then
   echo "Installing dependencies..."
   npm install
 fi
 
-# -----------------------------
-# MODE CONFIG
-# -----------------------------
 
-if [[ "$MODE" == "dev" ]]; then
-
-  echo "⚡ DEV mode"
-
-  npm run dev
-
-elif [[ "$MODE" == "local" ]]; then
-
-  echo "🖥 LOCAL production build"
-
-  npm run build && npm start
-
-elif [[ "$MODE" == "prod" ]]; then
-
-  echo "🚀 PRODUCTION mode"
-
-  npm run build && npm start
-
-else
-  echo "Unknown mode: $MODE"
-  exit 1
-fi
+case "$LAUNCH_MODE" in
+  dev)
+    exec npm run dev
+    ;;
+  prod)
+    npm run build && exec npm start
+    ;;
+  *)
+    echo "[frontend] ERROR: unknown LAUNCH_MODE '$LAUNCH_MODE'" >&2
+    exit 1
+    ;;
+esac

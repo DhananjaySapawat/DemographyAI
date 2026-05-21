@@ -1,82 +1,45 @@
 #!/bin/bash
+set -euo pipefail
 
-MODE=${APP_MODE:-dev}
-PORT=${MODEL_PORT:-9000}
+: "${MODEL_PORT:?MODEL_PORT is not set}"
+: "${BACKEND_PORT:?BACKEND_PORT is not set}"
+: "${LAUNCH_MODE:?LAUNCH_MODE is not set}"
 
-echo "Model service starting..."
-echo "Mode: $MODE"
+export BACKEND_URL="http://localhost:$BACKEND_PORT"
 
-# -----------------------------
-# IP VARS
-# -----------------------------
-
-IP=$(hostname -I | awk '{print $1}')
-
-if [ -z "$IP" ]; then
-  IP="localhost"
-fi
-
-export IP
-
-# -----------------------------
-# ENV VARS
-# -----------------------------
-export BACKEND_URL="http://localhost:8000"
-export BASE_URL="http://localhost:9000"
-
-# -----------------------------
-# CONDA ENV SETUP
-# -----------------------------
+echo "[model] port=$MODEL_PORT  backend=$BACKEND_URL"
 
 if command -v conda &> /dev/null; then
-
-    echo "Conda detected"
-
+    echo "[model] Conda detected"
     source "$(conda info --base)/etc/profile.d/conda.sh"
-
     ENV_NAME="demo_model"
 
     if ! conda env list | grep -q "$ENV_NAME"; then
-      echo "Creating conda environment..."
-
+      echo "[model] Creating conda environment..."
       conda create -y -n $ENV_NAME python=3.11
       conda activate $ENV_NAME
-
       pip install -r requirements.txt
 
     else
-      echo "Using existing conda environment"
       conda activate $ENV_NAME
     fi
 
 else
-    echo "⚠ Conda not found, using system python"
+  echo "[model] WARNING: conda not found, using system python" >&2
 fi
-
-# -----------------------------
-# MODE CONFIG
-# -----------------------------
-
-if [[ "$MODE" == "dev" ]]; then
-
-  echo "⚡ MODEL DEV mode"
-
-  uvicorn main:app \
-    --host 0.0.0.0 \
-    --port $PORT \
-    --reload
-
-
-elif [[ "$MODE" == "local" || "$MODE" == "prod" ]]; then
-
-  echo "🖥 MODEL LOCAL AND PROUCTION mode"
-
-  gunicorn main:app \
-    -k uvicorn.workers.UvicornWorker \
-    -w $(nproc) \
-    -b 0.0.0.0:$PORT
-
-else
-  echo "Unknown mode: $MODE"
-  exit 1
-fi
+case "$LAUNCH_MODE" in
+  dev)
+    exec uvicorn main:app --host 0.0.0.0 --port "$MODEL_PORT" --reload
+    ;;
+  prod)
+    exec gunicorn main:app \
+      -k uvicorn.workers.UvicornWorker \
+      -w "$(nproc)" \
+      -b "0.0.0.0:$MODEL_PORT" \
+      --timeout 120
+    ;;
+  *)
+    echo "[model] ERROR: unknown LAUNCH_MODE '$LAUNCH_MODE'" >&2
+    exit 1
+    ;;
+esac
