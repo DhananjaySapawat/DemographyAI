@@ -5,7 +5,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1 import detect, monitor
+from app.api.v1 import detect, monitor, monitor_auth
 from app.startup import init_startup
 from app.config import WEBSITE_NAME, ALLOWED_ORIGINS
 
@@ -25,7 +25,6 @@ app = FastAPI(title=f"{WEBSITE_NAME}-BACKEND")
 # -----------------------------
 # CORS Middleware
 # -----------------------------
-print(f"Allowed Origins: {ALLOWED_ORIGINS}")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,   
@@ -44,3 +43,4 @@ init_startup(app)
 # -----------------------------
 app.include_router(detect.router, prefix="", tags=["Detect"])
 app.include_router(monitor.router, prefix="/api/monitor", tags=["Monitor"])
+app.include_router(monitor_auth.router, prefix="/auth/monitor", tags=["Monitor"])

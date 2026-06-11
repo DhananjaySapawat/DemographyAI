@@ -14,7 +14,7 @@ echo "[backend] port=$BACKEND_PORT  model=$MODEL_URL  base=$BASE_URL"
 
 if command -v conda &>/dev/null; then
   source "$(conda info --base)/etc/profile.d/conda.sh"
-  ENV_NAME="tle_backend"
+  ENV_NAME="demo_backend"
   if ! conda env list | grep -q "$ENV_NAME"; then
     echo "[backend] creating conda env $ENV_NAME..."
     conda create -y -n "$ENV_NAME" python=3.11
