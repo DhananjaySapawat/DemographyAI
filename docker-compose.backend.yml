@@ -35,41 +35,5 @@ services:
       - model
     restart: unless-stopped
 
-  frontend:
-    build:
-      context: ./frontend
-      args:
-        NEXT_PUBLIC_BASE_URL: ${PUBLIC_FRONTEND_URL}
-        NEXT_PUBLIC_BACKEND_URL: ${PUBLIC_BACKEND_URL}
-    container_name: demo_frontend
-    ports:
-      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
-    environment:
-      DEPLOY_MODE: ${DEPLOY_MODE}
-      PUBLIC_FRONTEND_URL: ${PUBLIC_FRONTEND_URL}
-      PUBLIC_BACKEND_URL: ${PUBLIC_BACKEND_URL}
-      FRONTEND_PORT: ${FRONTEND_PORT}
-    depends_on:
-      - backend
-    restart: unless-stopped
-
-  monitor:
-    build:
-      context: ./monitor
-      args:
-        NEXT_PUBLIC_BASE_URL: ${PUBLIC_MONITOR_URL}
-        NEXT_PUBLIC_BACKEND_URL: ${PUBLIC_BACKEND_URL}
-    container_name: demo_monitor
-    ports:
-      - "${MONITOR_PORT}:${MONITOR_PORT}"
-    environment:
-      DEPLOY_MODE: ${DEPLOY_MODE}
-      PUBLIC_MONITOR_URL: ${PUBLIC_MONITOR_URL}
-      PUBLIC_BACKEND_URL: ${PUBLIC_BACKEND_URL}
-      MONITOR_PORT: ${MONITOR_PORT}
-    depends_on:
-      - backend
-    restart: unless-stopped
-
 volumes:
   backend_storage:

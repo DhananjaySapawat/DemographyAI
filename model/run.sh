@@ -1,25 +1,23 @@
 #!/bin/bash
 set -euo pipefail
 
+: "${LOCAL_MODEL_URL:?LOCAL_MODEL_URL is not set}"
 : "${MODEL_PORT:?MODEL_PORT is not set}"
-: "${BACKEND_PORT:?BACKEND_PORT is not set}"
-: "${LAUNCH_MODE:?LAUNCH_MODE is not set}"
+: "${LOCAL_BACKEND_URL:?LOCAL_BACKEND_URL is not set}"
+: "${DEPLOY_MODE:?DEPLOY_MODE is not set}"
 
-export BACKEND_URL="http://localhost:$BACKEND_PORT"
+export BACKEND_URL="$LOCAL_BACKEND_URL"
+export MODEL_URL="$LOCAL_MODEL_URL"
 
-echo "[model] port=$MODEL_PORT  backend=$BACKEND_URL"
+echo "[model] model=$MODEL_URL backend=$BACKEND_URL port=$MODEL_PORT"
 
 if command -v conda &> /dev/null; then
     echo "[model] Conda detected"
     source "$(conda info --base)/etc/profile.d/conda.sh"
-    ENV_NAME="demo_model"
+    ENV_NAME="demographyai-model"
 
     if ! conda env list | grep -q "$ENV_NAME"; then
-      echo "[model] Creating conda environment..."
-      conda create -y -n $ENV_NAME python=3.11
-      conda activate $ENV_NAME
-      pip install -r requirements.txt
-
+      echo "[model] WARNING: conda env '$ENV_NAME' not found, using system python" >&2
     else
       conda activate $ENV_NAME
     fi
@@ -27,11 +25,12 @@ if command -v conda &> /dev/null; then
 else
   echo "[model] WARNING: conda not found, using system python" >&2
 fi
-case "$LAUNCH_MODE" in
-  dev)
+
+case "$DEPLOY_MODE" in
+  development)
     exec uvicorn main:app --host 0.0.0.0 --port "$MODEL_PORT" --reload
     ;;
-  prod)
+  production)
     exec gunicorn main:app \
       -k uvicorn.workers.UvicornWorker \
       -w "$(nproc)" \
@@ -39,7 +38,7 @@ case "$LAUNCH_MODE" in
       --timeout 120
     ;;
   *)
-    echo "[model] ERROR: unknown LAUNCH_MODE '$LAUNCH_MODE'" >&2
+    echo "[model] ERROR: unknown DEPLOY_MODE '$DEPLOY_MODE'" >&2
     exit 1
     ;;
 esac

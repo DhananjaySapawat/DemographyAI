@@ -1,21 +1,3 @@
-# run_once.py — delete this file after running
-#import bcrypt
-#import secrets
-
-# generates your password hash — paste output into .env as MONITOR_PASSWORD_HASH
-#print(bcrypt.hashpw("SamosaBhai@312".encode(), bcrypt.gensalt()).decode())
-
-
-# generates your session secret — paste output into .env as SESSION_SECRET
-#print(secrets.token_hex(32))
-
-
-
-
-
-
-
-
 from app.utils import load_env
 
 DEPLOY_MODE = load_env("DEPLOY_MODE") 

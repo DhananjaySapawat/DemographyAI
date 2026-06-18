@@ -1,35 +1,30 @@
 #!/bin/bash
 set -euo pipefail
 
+: "${PUBLIC_FRONTEND_URL:?PUBLIC_FRONTEND_URL is not set}"
 : "${FRONTEND_PORT:?FRONTEND_PORT is not set}"
-: "${BACKEND_PORT:?BACKEND_PORT is not set}"
-: "${LAUNCH_MODE:?LAUNCH_MODE is not set}"
-: "${IP:?IP is not set}"
+: "${PUBLIC_BACKEND_URL:?PUBLIC_BACKEND_URL is not set}"
+: "${DEPLOY_MODE:?DEPLOY_MODE is not set}"
 
-export NEXT_PUBLIC_BASE_URL="http://$IP:$FRONTEND_PORT"
-export NEXT_PUBLIC_BACKEND_URL="http://$IP:$BACKEND_PORT"
+export NEXT_PUBLIC_BASE_URL="$PUBLIC_FRONTEND_URL"
+export NEXT_PUBLIC_BACKEND_URL="$PUBLIC_BACKEND_URL"
 
-echo "[frontend] url=$NEXT_PUBLIC_BASE_URL  backend=$NEXT_PUBLIC_BACKEND_URL"
+echo "[frontend] url=$NEXT_PUBLIC_BASE_URL  backend=$NEXT_PUBLIC_BACKEND_URL port=$FRONTEND_PORT"
 
 if ! command -v npm &> /dev/null; then
   echo "⚠ npm not found"
   exit 1
 fi
-if [ ! -d "node_modules" ]; then
-  echo "Installing dependencies..."
-  npm install
-fi
 
-
-case "$LAUNCH_MODE" in
-  dev)
-    exec npm run dev
+case "$DEPLOY_MODE" in
+  development)
+    exec npm run dev -- -p "$FRONTEND_PORT"
     ;;
-  prod)
-    npm run build && exec npm start
+  production)
+    npm run build && exec npm start -- -p "$FRONTEND_PORT"
     ;;
   *)
-    echo "[frontend] ERROR: unknown LAUNCH_MODE '$LAUNCH_MODE'" >&2
+    echo "[frontend] ERROR: unknown DEPLOY_MODE '$DEPLOY_MODE'" >&2
     exit 1
     ;;
 esac

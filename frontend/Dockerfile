@@ -2,18 +2,23 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-ARG NEXT_PUBLIC_BASE_URL
-ARG NEXT_PUBLIC_BACKEND_URL
-
-ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
-ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
-
-COPY package*.json ./
+COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
-#RUN npm run build
 
-EXPOSE 3000
+ARG NEXT_PUBLIC_BASE_URL
+ARG NEXT_PUBLIC_BACKEND_URL
+ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
+ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
 
-CMD ["npm", "run", "dev"]
+RUN if [ "$DEPLOY_MODE" = "production" ]; then npm run build; fi
+
+EXPOSE ${FRONTEND_PORT}
+
+CMD ["sh", "-c", "\
+    if [ \"$DEPLOY_MODE\" = 'production' ]; then \
+        npm start -- -p ${FRONTEND_PORT}; \
+    else \
+        npm run dev -- -p ${FRONTEND_PORT}; \
+    fi"]

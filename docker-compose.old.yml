@@ -1,0 +1,77 @@
+services:
+
+  model:
+    build: ./model
+    container_name: demo_model
+    ports:
+      - "9000:9000"
+    environment:
+      DEPLOY_MODE: ${DEPLOY_MODE}
+      DEPLOY_PROFILE: ${DEPLOY_PROFILE}
+      BACKEND_PORT: 8000
+      MODEL_PORT: 9000
+      BACKEND_URL: http://backend:8000
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    container_name: demo_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - backend_storage:/app/local_storage
+    environment:
+      DEPLOY_MODE: ${DEPLOY_MODE}
+      LAUNCH_MODE: prod
+      DEPLOY_PROFILE: ${DEPLOY_PROFILE}
+      STORAGE_PROVIDER: ${STORAGE_PROVIDER}
+      DB_PROVIDER: ${DB_PROVIDER}
+      BACKEND_PORT: 8000
+      MODEL_PORT: 9000
+      MODEL_URL: http://model:9000
+      LOCAL_BASE_URL: http://localhost:8000
+      BASE_URL: http://${IP}:8000
+    depends_on:
+      - model
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_BASE_URL: http://${IP}:3000
+        NEXT_PUBLIC_BACKEND_URL: http://${IP}:8000
+    container_name: demo_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      DEPLOY_MODE: ${DEPLOY_MODE}
+      FRONTEND_PORT: 3000
+      BACKEND_PORT: 8000
+      NEXT_PUBLIC_BASE_URL: http://${IP}:3000
+      NEXT_PUBLIC_BACKEND_URL: http://${IP}:8000
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  monitor:
+    build:
+      context: ./monitor
+      args:
+        NEXT_PUBLIC_BASE_URL: http://${IP}:4000
+        NEXT_PUBLIC_BACKEND_URL: http://${IP}:8000
+    container_name: demo_monitor
+    ports:
+      - "4000:4000"
+    environment:
+      DEPLOY_MODE: ${DEPLOY_MODE}
+      MONITOR_PORT: 4000
+      BACKEND_PORT: 8000
+      NEXT_PUBLIC_BASE_URL: http://${IP}:4000
+      NEXT_PUBLIC_BACKEND_URL: http://${IP}:8000
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  backend_storage:
